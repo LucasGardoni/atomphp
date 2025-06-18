@@ -1,0 +1,7 @@
+/vendor/
+#-------------------------
+# Environment Files
+#-------------------------
+.env
+composer.lock
+.http
