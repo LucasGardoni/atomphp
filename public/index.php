@@ -11,6 +11,14 @@ require_once ".." . DIRECTORY_SEPARATOR . "app" . DIRECTORY_SEPARATOR . "config"
 // seta time zone
 date_default_timezone_set(DEFAULT_TIME_ZONE);
 
+// Remove query string para evitar que a rota capture parâmetros incorretos
+$uriLimpo = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+if ($uriLimpo !== null) {
+    $_SERVER['REQUEST_URI'] = $uriLimpo;
+}
+
+
+
 $ambiente = new Ambiente();
 $routes = new Routes();
 

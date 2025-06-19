@@ -12,27 +12,27 @@ class PacienteModel extends ModelMain
     public $validationRules = [
         "nome"  => [
             "label" => 'Nome Completo',
-            "rules" => 'obrigatorio|minimo:3|maximo:255'
+            "rules" => 'required|min:3|max:255'
         ],
         "cpf"  => [
             "label" => 'CPF',
-            "rules" => 'maximo:14'
+            "rules" => 'max:14'
         ],
         "data_nascimento"  => [
             "label" => 'Data de Nascimento',
-            "rules" => 'data'
+            "rules" => 'date'
         ],
         "telefone" => [
             "label" => 'Telefone',
-            "rules" => 'maximo:20'
+            "rules" => 'max:20'
         ],
         "plano_saude" => [
             "label" => 'Plano de Saúde',
-            "rules" => 'maximo:100'
+            "rules" => 'max:100'
         ],
         "status" => [
             "label" => "Status",
-            "rules" => "obrigatorio|int"
+            "rules" => "required|int"
         ]
     ];
 
@@ -41,12 +41,12 @@ class PacienteModel extends ModelMain
      */
     public function listaPacientesAtivos(string $orderBy = 'nome', string $direction = 'ASC'): ?array
     {
-        // Corrigido para passar coluna e direção separadamente ao orderBy, evitando erro de sintaxe SQL
         return $this->db->select("pacientes.*")
                        ->where("pacientes.status", 1)
                        ->orderBy($orderBy, $direction)
                        ->findAll();
     }
+
 
 
     public function listaPacientes(string $orderBy = 'nome', string $direction = 'ASC'): ?array

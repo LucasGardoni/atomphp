@@ -58,9 +58,9 @@ class ModelMain
      * @param array $dados 
      * @return bool
      */
-    public function insert($dados)
+    public function insert($dados, $validar = true) // Adicione o parâmetro $validar
     {
-        if (Validator::make($dados, $this->validationRules)) {
+        if ($validar && Validator::make($dados, $this->validationRules)) { // Adicione a condição $validar
             return 0;
         } else {
             if ($this->db->insert($dados) > 0) {
@@ -80,13 +80,22 @@ class ModelMain
     public function update($dados)
     {
         if (Validator::make($dados, $this->validationRules)) {
-            return 0;
+            return 0; // Se a validação falhar, retorna falso.
         } else {
-            if ($this->db->where($this->primaryKey, $dados[$this->primaryKey])->update($dados) > 0) {
+            // Tenta executar a atualização no banco de dados.
+            $resultado = $this->db->where($this->primaryKey, $dados[$this->primaryKey])->update($dados);
+
+            // ---- INÍCIO DA CORREÇÃO ----
+            // A verificação foi alterada de '> 0' para '!== false'.
+            // Isso considera a operação um sucesso mesmo que 0 linhas sejam alteradas
+            // (o que acontece quando você salva sem modificar os dados).
+            // A operação só será considerada uma falha se o banco retornar um erro explícito (false).
+            if ($resultado !== false) {
                 return true;
             } else {
                 return false;
             }
+            // ---- FIM DA CORREÇÃO ----
         }
     }
 
