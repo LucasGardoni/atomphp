@@ -1,0 +1,199 @@
+/* Base Layout */
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+}
+
+main {
+    flex-grow: 1;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+/* Header Styles */
+.header-custom {
+    background-color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.header-custom:hover {
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.nav-link-custom {
+    color: #555;
+    font-weight: 500;
+    transition: color 0.3s ease, transform 0.2s ease;
+    position: relative;
+}
+
+.nav-link-custom::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    background-color: #0d6efd;
+    left: 0;
+    bottom: -5px;
+    transition: width 0.3s ease;
+}
+
+.nav-link-custom:hover {
+    color: #0d6efd;
+    transform: translateY(-2px);
+}
+
+.nav-link-custom:hover::after {
+    width: 100%;
+}
+
+/* Brand Logo and Text */
+.navbar-brand-logo {
+    width: 40px;
+    height: 40px;
+    background-color: #0d6efd;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.navbar-brand-logo:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.navbar-brand-text {
+    color: #212529;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.icon-heart {
+    color: white;
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+/* Desktop Navigation Spacing */
+@media (min-width: 768px) {
+    .navbar-nav .nav-item+.nav-item {
+        margin-left: 2rem;
+    }
+
+    .navbar-nav .dropdown.nav-item+.nav-item {
+        margin-left: 1.5rem;
+    }
+}
+
+/* Footer Styles */
+.footer-bg-custom {
+    background-color: #1a202c;
+    padding: 3rem 0;
+    color: #e2e8f0;
+}
+
+.text-footer-muted {
+    color: #a0aec0;
+    font-size: 0.9rem;
+}
+
+.border-footer-divider {
+    border-color: #4a5568 !important;
+    opacity: 0.7;
+}
+
+.footer-brand-logo {
+    width: 40px;
+    height: 40px;
+    background-color: #2563eb;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.footer-icon-heart {
+    color: white;
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.footer-brand-text {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.5px;
+}
+
+.footer-heading {
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 1.25rem;
+    position: relative;
+    padding-bottom: 5px;
+}
+
+.footer-heading::after {
+    content: '';
+    position: absolute;
+    width: 50px;
+    height: 3px;
+    background-color: #2563eb;
+    left: 0;
+    bottom: 0;
+    border-radius: 2px;
+}
+
+.footer-list-link {
+    color: #c4d0de;
+    text-decoration: none;
+    transition: color 0.3s ease, transform 0.2s ease;
+    display: inline-block;
+}
+
+.footer-list-link:hover {
+    color: #63b3ed;
+    transform: translateX(5px);
+}
+
+/* Utility adjustments */
+.z-50 {
+    z-index: 1050 !important;
+}
+
+/* Responsive spacing for footer columns */
+@media (max-width: 767.98px) {
+    .footer-section .container {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
+    .footer-grid-mobile>div {
+        margin-bottom: 2.5rem;
+    }
+
+    .footer-grid-mobile>div:last-child {
+        margin-bottom: 0;
+    }
+}

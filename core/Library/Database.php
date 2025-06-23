@@ -678,6 +678,8 @@ class Database
      */
     public function insert(array $data)
     {
+
+
         try {
             $columns = implode(", ", array_keys($data));
             $placeHolders = ":" . implode(", :", array_keys($data));

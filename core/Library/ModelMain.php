@@ -58,17 +58,19 @@ class ModelMain
      * @param array $dados 
      * @return bool
      */
-    public function insert($dados, $validar = true) // Adicione o parâmetro $validar
+    public function insert($dados, $validar = true, $lRetornaId = false)
     {
-        if ($validar && Validator::make($dados, $this->validationRules)) { // Adicione a condição $validar
-            return 0;
+        if ($validar && Validator::make($dados, $this->validationRules)) {
+            return false;
+        }
+
+        $return = $this->db->insert($dados);
+
+        if ($return > 0) {
+            return $return;
         } else {
-            if ($this->db->insert($dados) > 0) {
-                return true;
-            } else {
-                return false;
-            }
-        } 
+            return false;
+        }
     }
 
     /**

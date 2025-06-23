@@ -1,66 +1,139 @@
+<link rel="stylesheet" href="<?= baseUrl() ?>assets/css/formPaciente.css">
 <?php
 $action = $aDados['action'] ?? 'insert';
 $isViewMode = ($action === 'view');
 $disabledAttribute = $isViewMode ? 'disabled' : '';
 ?>
 
-<?= formTitulo($aDados['titulo'] ?? 'Formulário do Fisioterapeuta') ?>
-
-<div class="m-2">
-    <form method="POST" action="<?= $isViewMode ? '#' : $this->request->formAction() ?>">
-        <input type="hidden" name="id" id="id" value="<?= setValor("id", $aDados['fisioterapeuta']['id'] ?? '') ?>">
-
-        <div class="row">
-            <div class="col-md-8 mb-3">
-                <label for="nome" class="form-label">Nome Completo <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="nome" name="nome" maxlength="255" value="<?= setValor("nome", $aDados['fisioterapeuta']['nome'] ?? '') ?>" required <?= $disabledAttribute ?>>
-                <?= setMsgFilderError("nome") ?>
-            </div>
-            <div class="col-md-4 mb-3">
-                <label for="crefito" class="form-label">CREFITO <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="crefito" name="crefito" maxlength="20" value="<?= setValor("crefito", $aDados['fisioterapeuta']['crefito'] ?? '') ?>" required <?= $disabledAttribute ?>>
-                <?= setMsgFilderError("crefito") ?>
-            </div>
+<div class="space-y-6 container py-4">
+    <div class="d-flex align-items-center mb-4">
+    <a href="<?= baseUrl() ?>Fisioterapeuta/index" class="btn btn-custom-primary btn-sm me-3">
+            <i class="bi bi-arrow-left me-2"></i> Voltar
+        </a>
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-1"><?= $aDados['titulo'] ?? 'Formulário do Fisioterapeuta' ?></h1>
+            <p class="text-muted">Preencha os detalhes do fisioterapeuta.</p>
         </div>
+        <?php if ($action === 'view' || $action === 'update'): ?>
+            <a href="<?= baseUrl() ?>Fisioterapeuta/index" class="btn btn-custom-primary btn-sm">
+                <i class="bi bi-arrow-left me-2"></i> Voltar
+            </a>
+        <?php endif; ?>
+    </div>
 
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <label for="cpf" class="form-label">CPF <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="cpf" name="cpf" maxlength="14" value="<?= setValor("cpf", $aDados['fisioterapeuta']['cpf'] ?? '') ?>" required <?= $disabledAttribute ?>>
-                <?= setMsgFilderError("cpf") ?>
-            </div>
-            <div class="col-md-4 mb-3">
-                <label for="telefone" class="form-label">Telefone</label>
-                <input type="text" class="form-control" id="telefone" name="telefone" maxlength="20" value="<?= setValor("telefone", $aDados['fisioterapeuta']['telefone'] ?? '') ?>" <?= $disabledAttribute ?>>
-                <?= setMsgFilderError("telefone") ?>
-            </div>
-             <div class="col-md-4 mb-3">
-                <label for="email" class="form-label">E-mail</label>
-                <input type="email" class="form-control" id="email" name="email" maxlength="150" value="<?= setValor("email", $aDados['fisioterapeuta']['email'] ?? '') ?>" <?= $disabledAttribute ?>>
-                <?= setMsgFilderError("email") ?>
-            </div>
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-white py-3">
+            <h5 class="card-title fw-bold mb-0">Dados do Fisioterapeuta</h5>
         </div>
+        <div class="card-body py-4">
+            <form method="POST" action="<?= $isViewMode ? '#' : $this->request->formAction() ?>">
+                <input type="hidden" name="id" id="id" value="<?= setValor("id", $aDados['fisioterapeuta']['id'] ?? '') ?>">
 
-        <div class="row">
-            <div class="col-md-8 mb-3">
-                <label for="especialidade" class="form-label">Especialidade(s)</label>
-                <input type="text" class="form-control" id="especialidade" name="especialidade" maxlength="100" value="<?= setValor("especialidade", $aDados['fisioterapeuta']['especialidade'] ?? '') ?>" <?= $disabledAttribute ?>>
-                <?= setMsgFilderError("especialidade") ?>
-            </div>
-            <?php if ($action !== 'insert') : ?>
-                <div class="col-md-4 mb-3">
-                    <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
-                    <select class="form-control" id="status" name="status" required <?= $disabledAttribute ?>>
-                        <option value="1" <?= (setValor("status", $aDados['fisioterapeuta']['status'] ?? '1') == "1" ? 'SELECTED' : '') ?>>Ativo</option>
-                        <option value="0" <?= (setValor("status", $aDados['fisioterapeuta']['status'] ?? '') == "0" ? 'SELECTED' : '') ?>>Inativo</option>
-                    </select>
-                    <?= setMsgFilderError("status") ?>
+                <div class="row g-4 mb-4">
+                    <div class="col-12 col-md-8">
+                        <label for="nome" class="form-label text-sm font-semibold text-gray-800 mb-2">
+                            Nome Completo <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control form-control-custom" id="nome" name="nome" value="<?= setValor("nome", $aDados['fisioterapeuta']['nome'] ?? '') ?>" required <?= $disabledAttribute ?>>
+                        <?= setMsgFilderError("nome") ?>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label for="crefito" class="form-label text-sm font-semibold text-gray-800 mb-2">
+                            CREFITO <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control form-control-custom" id="crefito" name="crefito" value="<?= setValor("crefito", $aDados['fisioterapeuta']['crefito'] ?? '') ?>" required <?= $disabledAttribute ?>>
+                        <?= setMsgFilderError("crefito") ?>
+                    </div>
                 </div>
-            <?php else: ?>
-                <input type="hidden" name="status" value="1">
-            <?php endif; ?>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-12 col-md-4">
+                        <label for="cpf" class="form-label text-sm font-semibold text-gray-800 mb-2">
+                            CPF <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control form-control-custom" id="cpf" name="cpf" value="<?= setValor("cpf", $aDados['fisioterapeuta']['cpf'] ?? '') ?>" required <?= $disabledAttribute ?>>
+                        <?= setMsgFilderError("cpf") ?>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label for="telefone" class="form-label text-sm font-semibold text-gray-800 mb-2">
+                            Telefone
+                        </label>
+                        <input type="text" class="form-control form-control-custom" id="telefone" name="telefone" value="<?= setValor("telefone", $aDados['fisioterapeuta']['telefone'] ?? '') ?>" <?= $disabledAttribute ?>>
+                        <?= setMsgFilderError("telefone") ?>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label for="email" class="form-label text-sm font-semibold text-gray-800 mb-2">
+                            E-mail
+                        </label>
+                        <input type="email" class="form-control form-control-custom" id="email" name="email" value="<?= setValor("email", $aDados['fisioterapeuta']['email'] ?? '') ?>" <?= $disabledAttribute ?>>
+                        <?= setMsgFilderError("email") ?>
+                    </div>
+                </div>
+
+                <hr class="my-5"> <div class="mb-4">
+                    <label class="form-label text-lg font-bold text-gray-900 mb-3">Especialidades</label>
+                    <div class="border p-4 rounded-3 bg-light-subtle shadow-sm"> <div class="row g-3"> <?php
+                                $lista_especialidades = $aDados['lista_especialidades'] ?? [];
+                                $especialidades_atuais = $aDados['especialidades_atuais'] ?? [];
+                                if (empty($lista_especialidades)):
+                            ?>
+                                <div class="col-12">
+                                    <div class="alert-custom-info"> <div class="d-flex align-items-center">
+                                            <i class="bi bi-info-circle me-3 w-6 h-6"></i>
+                                            <div>
+                                                <strong class="font-bold">Nenhuma especialidade cadastrada!</strong>
+                                                <div class="mt-1">
+                                                    Para selecionar especialidades, você precisa <a href="<?= baseUrl() ?>Especialidade/form/insert/0" class="text-decoration-none fw-bold">cadastrar a primeira</a>.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php else: ?>
+                                <?php foreach ($lista_especialidades as $especialidade): ?>
+                                    <div class="col-12 col-md-4 col-sm-6">
+                                        <div class="form-check form-check-custom-checkbox py-2 px-3"> <input class="form-check-input" type="checkbox"
+                                                   name="especialidades[]"
+                                                   value="<?= $especialidade['id'] ?>"
+                                                   id="especialidade_<?= $especialidade['id'] ?>"
+                                                   <?= in_array($especialidade['id'], $especialidades_atuais) ? 'checked' : '' ?>
+                                                   <?= $disabledAttribute ?>>
+                                            <label class="form-check-label text-gray-800" for="especialidade_<?= $especialidade['id'] ?>">
+                                                <?= htmlspecialchars($especialidade['nome']) ?>
+                                            </label>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-12 col-md-4">
+                        <label for="status" class="form-label text-sm font-semibold text-gray-800 mb-2">
+                            Status <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select form-select-custom" id="status" name="status" required <?= $disabledAttribute ?>>
+                            <option value="1" <?= (setValor("status", $aDados['fisioterapeuta']['status'] ?? '1') == "1" ? 'SELECTED' : '') ?>>Ativo</option>
+                            <option value="0" <?= (setValor("status", $aDados['fisioterapeuta']['status'] ?? '') == "0" ? 'SELECTED' : '') ?>>Inativo</option>
+                        </select>
+                        <?= setMsgFilderError("status") ?>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-3 pt-4"> <?php if (!$isViewMode): ?>
+                        <button type="submit" class="btn btn-custom-primary">
+                            <i class="bi bi-check-lg me-2"></i> Salvar
+                        </button>
+                    <?php endif; ?>
+                    <a href="<?= baseUrl() ?>Fisioterapeuta/index" class="btn btn-custom-secondary">
+                        <i class="bi bi-x-lg me-2"></i> Cancelar
+                    </a>
+                </div>
+            </form>
         </div>
-        
-        <?= formButton() ?>
-    </form>
+    </div>
 </div>
+
+<?php limpaDadosSessao(); ?>
