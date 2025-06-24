@@ -8,6 +8,7 @@ use Core\Library\Session;
 use App\Model\EnderecoModel;
 use App\Model\PacienteModel;
 use Core\Library\Validator;
+use App\Model\PlanoSaudeModel; 
 
 class Paciente extends ControllerMain
 {
@@ -46,112 +47,105 @@ class Paciente extends ControllerMain
             }
         }
         
-        switch ($action) {
-            case 'update':
-                $aDados['titulo'] = 'Editar Paciente';
-                break;
-            case 'view':
-                $aDados['titulo'] = 'Visualizar Paciente';
-                break;
-            case 'insert':
-            default:
-                $aDados['titulo'] = 'Novo Paciente';
-                break;
-        }
-
+        $planoSaudeModel = new PlanoSaudeModel();
+        $aDados['planos_saude'] = $planoSaudeModel->findAllAtivos();
+        
         $this->loadView("sistema/formPaciente", $aDados);
     }
-
-    /**
-     * Processa a inserção de um novo paciente.
-     * Esta é a lógica CRÍTICA que precisava ser alterada.
-     */
+    
     public function insert(): void
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $post = $this->request->getPost();
-            $enderecoData = $post['endereco'] ?? [];
-            $pacienteData = $post['paciente'] ?? [];
-            
-            // Remove IDs para garantir que seja uma inserção
-            unset($pacienteData['id']);
-            unset($enderecoData['id']);
-            
-            $enderecoModel = new EnderecoModel();
-            
-            // Valida os dados antes de qualquer operação no banco
-            // Nota: O Validator do framework parece retornar 'true' em caso de erro. Ajustando a lógica.
-            if (Validator::make($enderecoData, $enderecoModel->validationRules) || Validator::make($pacienteData, $this->pacienteModel->validationRules)) {
-                 Redirect::page("Paciente/form/insert", ["msgError" => "Falha na validação. Verifique todos os campos obrigatórios."]);
-                 return;
-            }
-            
-            // 1. Salva o endereço primeiro e retorna o novo ID
-            $enderecoId = $enderecoModel->insert($enderecoData, false); 
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        Redirect::page('Paciente/form/insert', ['msgError' => 'Método inválido']);
+        return;
+    }
 
-            if ($enderecoId > 0) {
-                // 2. Adiciona o ID do endereço ao paciente
-                $pacienteData['endereco_id'] = $enderecoId; 
+    $post          = $this->request->getPost();
+    $enderecoData  = $post['endereco'] ?? [];
+    $pacienteData  = $post['paciente'] ?? [];
 
-                // 3. Salva o paciente
-                if ($this->pacienteModel->insert($pacienteData, false)) {
-                    Redirect::page('Paciente', ["msgSucesso" => "Paciente salvo com sucesso."]);
-                } else {
-                    // Se falhar, apaga o endereço órfão para não sujar o banco
-                    $enderecoModel->delete(['id' => $enderecoId]);
-                    Redirect::page("Paciente/form/insert", ["msgError" => "Falha ao salvar os dados do paciente."]);
-                }
-            } else {
-                Redirect::page("Paciente/form/insert", ["msgError" => "Falha ao salvar o endereço."]);
-            }
+    // 1) Remove IDs vazios
+    unset($pacienteData['id'], $enderecoData['id']);
+
+    // 2) Ajusta plano_saude_id e status
+    $pacienteData['plano_saude_id'] = $pacienteData['plano_saude_id'] ?: null;
+    $pacienteData['status']         = 1;
+
+    // 3) Insere o endereço (skipValidation = true)
+    $endModel   = new EnderecoModel();
+    $enderecoId = $endModel->insert($enderecoData, true);
+
+    if (!$enderecoId) {
+        $err = $endModel->db->error(); 
+        die('Erro ao inserir endereço: ' . ($err['message'] ?? 'Desconhecido'));
+    }
+
+    // 4) Insere o paciente (skipValidation = true)
+    $pacienteData['endereco_id'] = $enderecoId;
+    $ok = $this->pacienteModel->insert($pacienteData, true);
+
+    if (!$ok) {
+        $err = $this->pacienteModel->db->error();
+        die('Erro ao inserir paciente: ' . ($err['message'] ?? 'Desconhecido'));
+    }
+
+    // 5) Redireciona em sucesso
+    Redirect::page('Paciente', ['msgSucesso' => 'Paciente salvo com sucesso.']);
+}
+public function update(): void
+{
+    // 1) Só POST
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        Redirect::page('Paciente');
+        return;
+    }
+
+    // 2) Pega os dados
+    $post          = $this->request->getPost();
+    $enderecoData  = $post['endereco'] ?? [];
+    $pacienteData  = $post['paciente'] ?? [];
+
+    // 3) Confirma que veio o ID do paciente
+    if (empty($pacienteData['id'])) {
+        Redirect::page('Paciente', ['msgError' => 'ID do paciente ausente.']);
+        return;
+    }
+
+    // 4) Inserir ou atualizar o endereço
+    $endModel = new EnderecoModel();
+
+    if (!empty($enderecoData['id'])) {
+        // update endereço
+        $okEnd = $endModel->update($enderecoData, true);
+        if (!$okEnd) {
+            die('Erro ao atualizar endereço');
+        }
+        $enderecoId = $enderecoData['id'];
+    } else {
+        // insert endereço
+        unset($enderecoData['id']);
+        $enderecoId = $endModel->insert($enderecoData, true);
+        if (!$enderecoId) {
+            die('Erro ao inserir endereço');
         }
     }
 
-    /**
-     * Processa a atualização de um paciente e seu endereço.
-     */
-    public function update(): void
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $post = $this->request->getPost();
-            
-            $enderecoData = $post['endereco'] ?? [];
-            $pacienteData = $post['paciente'] ?? [];
-            
-            $enderecoModel = new EnderecoModel();
+    // 5) Prepara os dados do paciente (inclui o ID dentro do array)
+    $pacienteData['endereco_id']    = $enderecoId;
+    $pacienteData['plano_saude_id']  = $pacienteData['plano_saude_id'] ?: null;
+    $pacienteData['status']          = $pacienteData['status'] ?? 1;
 
-            if (Validator::make($enderecoData, $enderecoModel->validationRules) || Validator::make($pacienteData, $this->pacienteModel->validationRules)) {
-                Redirect::page("Paciente/form/update/" . $pacienteData['id'], ["msgError" => "Dados inválidos. Verifique os campos."]);
-                return;
-            }
-            
-            $enderecoId = $enderecoData['id'] ?? null;
-            
-            // Se já tem um ID, atualiza. Senão, insere um novo endereço.
-            if ($enderecoId) {
-                $enderecoModel->update($enderecoData);
-            } else {
-                unset($enderecoData['id']);
-                $enderecoId = $enderecoModel->insert($enderecoData, false);
-            }
-
-            if ($enderecoId) {
-                $pacienteData['endereco_id'] = $enderecoId;
-
-                if ($this->pacienteModel->update($pacienteData) !== false) {
-                    Redirect::page('Paciente', ["msgSucesso" => "Paciente atualizado com sucesso."]);
-                } else {
-                    Redirect::page("Paciente/form/update/" . $pacienteData['id'], ["msgError" => "Falha ao atualizar dados do paciente."]);
-                }
-            } else {
-                Redirect::page("Paciente/form/update/" . $pacienteData['id'], ["msgError" => "Ocorreu um erro ao salvar o endereço."]);
-            }
-        }
+    // 6) Atualiza o paciente (skipValidation = true)
+    $okPac = $this->pacienteModel->update($pacienteData, true);
+    if (!$okPac) {
+        die('Erro ao atualizar paciente');
     }
-    
-    // As funções index() e delete() que você já tem podem permanecer as mesmas.
-    // Colei as que você enviou para garantir.
-    
+
+    // 7) Sucesso
+    Redirect::page('Paciente', ['msgSucesso' => 'Paciente atualizado com sucesso.']);
+}
+
+
     public function index(): void
     {
         $filtro = $_GET['filtro_status'] ?? 'ativos';
@@ -174,29 +168,40 @@ class Paciente extends ControllerMain
         $this->loadView("sistema/listaPaciente", $aDados);
     }
 
-    public function delete(): void
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $post = $this->request->getPost();
 
-            if (empty($post['id'])) {
-                 Redirect::page('Paciente', ["msgError" => "ID do paciente não fornecido para exclusão."]);
-                 return;
-            }
-            
-            $paciente = $this->pacienteModel->getById($post['id']);
-            
-            if ($this->pacienteModel->delete($post)) {
-                if ($paciente && !empty($paciente['endereco_id'])) {
-                    $enderecoModel = new EnderecoModel();
-                    $enderecoModel->delete(['id' => $paciente['endereco_id']]);
-                }
-                Redirect::page('Paciente', ["msgSucesso" => "Paciente e endereço associado excluídos com sucesso."]);
-            } else {
-                Redirect::page('Paciente', ["msgError" => "Erro ao excluir paciente."]);
-            }
-        } else {
-            Redirect::page('Paciente');
-        }
+public function delete(): void
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        Redirect::page('Paciente');
+        return;
     }
+
+    $post = $this->request->getPost();
+    $id   = isset($post['id']) ? (int) $post['id'] : 0;
+
+    if ($id < 1) {
+        Redirect::page('Paciente', ["msgError" => "ID do paciente não fornecido para exclusão."]);
+        return;
+    }
+
+    // busca antes de deletar para pegar o endereco_id
+    $paciente = $this->pacienteModel->getById($id);
+    if (! $paciente) {
+        Redirect::page('Paciente', ["msgError" => "Paciente não encontrado."]);
+        return;
+    }
+
+    // exclui pelo ID
+    if ($this->pacienteModel->delete($id)) {
+        // se havia endereço associado, exclui também
+        if (! empty($paciente['endereco_id'])) {
+            $enderecoModel = new EnderecoModel();
+            $enderecoModel->delete((int) $paciente['endereco_id']);
+        }
+        Redirect::page('Paciente', ["msgSucesso" => "Paciente e endereço associado excluídos com sucesso."]);
+    } else {
+        Redirect::page('Paciente', ["msgError" => "Erro ao excluir paciente."]);
+    }
+}
+
 }

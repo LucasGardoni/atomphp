@@ -6,52 +6,31 @@ use Core\Library\ModelMain;
 
 class PacienteModel extends ModelMain
 {
-    // O nome da sua tabela, como você definiu.
-    protected $table = 'pacientes'; 
+    protected $table = 'pacientes';
     protected $pk_table = 'id';
 
-    /**
-     * @var array Define os campos que podem ser preenchidos em massa.
-     * Isso é essencial para que o controller consiga salvar os dados.
-     * Adicionei todos os campos do seu formulário + a chave estrangeira.
-     */
     protected $fillable = [
         'nome',
         'cpf',
         'data_nascimento',
         'telefone',
-        'plano_saude',
         'historico_clinico',
         'status',
-        'endereco_id' // O campo mais importante para a correção.
+        'endereco_id',
+        'plano_saude_id'
     ];
     
-    // Suas regras de validação originais. Estão corretas.
+    /**
+     * @var array REGRAS DE VALIDAÇÃO CORRIGIDAS PARA O INGLÊS
+     */
     public $validationRules = [
-        "nome"  => [
-            "label" => 'Nome Completo',
-            "rules" => 'required|min:3|max:255'
-        ],
-        "cpf"  => [
-            "label" => 'CPF',
-            "rules" => 'max:14'
-        ],
-        "data_nascimento"  => [
-            "label" => 'Data de Nascimento',
-            "rules" => 'date'
-        ],
-        "telefone" => [
-            "label" => 'Telefone',
-            "rules" => 'max:20'
-        ],
-        "plano_saude" => [
-            "label" => 'Plano de Saúde',
-            "rules" => 'max:100'
-        ],
-        "status" => [
-            "label" => "Status",
-            "rules" => "required|int"
-        ]
+        "nome"              => ["label" => 'Nome Completo',     "rules" => 'required|min:3|max:255'],
+        "cpf"               => ["label" => 'CPF',               "rules" => 'required|max:14'],
+        "data_nascimento"   => ["label" => 'Data de Nascimento', "rules" => 'permit_empty|date'],
+        "telefone"          => ["label" => 'Telefone',          "rules" => 'required|max:20'],
+        "status"            => ["label" => 'Status',            "rules" => 'required|integer'],
+        "plano_saude_id"    => ["label" => 'Plano de Saúde',     "rules" => 'permit_empty|integer'],
+        "historico_clinico" => ["label" => 'Histórico Clínico',  "rules" => 'permit_empty|max:1000'],
     ];
 
     /**

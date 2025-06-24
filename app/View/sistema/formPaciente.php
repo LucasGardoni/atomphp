@@ -3,9 +3,27 @@
 $action = $aDados['action'] ?? 'insert';
 $isViewMode = ($action === 'view');
 $disabledAttribute = $isViewMode ? 'disabled' : '';
+
+
+$errors = $aDados['erros'] ?? [];
+
 ?>
 
 <div class="space-y-6 container py-4">
+
+
+<?php if (!empty($errors)): ?>
+        <div class="alert alert-danger">
+            <strong>Por favor, corrija os seguintes erros:</strong>
+            <ul>
+                <?php foreach ($errors as $error): ?>
+                    <li><?= htmlspecialchars($error) ?></li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+<?php endif; ?>
+
+
     <div class="d-flex align-items-center mb-4">
         <a href="<?= baseUrl() ?>Paciente" class="btn btn-custom-primary btn-sm me-3">
             <i class="bi bi-arrow-left me-2"></i> Voltar
@@ -47,40 +65,61 @@ $disabledAttribute = $isViewMode ? 'disabled' : '';
         </div>
 
         <div class="card shadow-sm border-0 rounded-3">
-            <div class="card-header bg-white py-3"><h5 class="card-title fw-bold mb-0">Outras Informações</h5></div>
-            <div class="card-body py-4">
-                <div class="row g-4">
-                    <div class="col-12 col-md-6"><label class="form-label font-semibold">Plano de Saúde</label><input type="text" class="form-control form-control-custom" name="paciente[plano_saude]" value="<?= setValor("plano_saude", $aDados['paciente']['plano_saude'] ?? '') ?>" <?= $disabledAttribute ?>></div>
-                </div>
-                <div class="row g-4 mt-1">
-                    <div class="col-12"><label class="form-label font-semibold">Histórico Clínico / Observações</label><textarea class="form-control form-control-custom" name="paciente[historico_clinico]" rows="4" <?= $disabledAttribute ?>><?= setValor("historico_clinico", $aDados['paciente']['historico_clinico'] ?? '') ?></textarea></div>
-                </div>
+    <div class="card-header bg-white py-3"><h5 class="card-title fw-bold mb-0">Outras Informações</h5></div>
+    <div class="card-body py-4">
+        <div class="row g-4">
+            <div class="col-12 col-md-6">
+                <label for="plano_saude_id" class="form-label font-semibold">Plano de Saúde</label>
+                
+                <!-- CAMPO DE TEXTO TROCADO POR UMA COMBOBOX (SELECT) -->
+                <select class="form-select form-select-custom" id="plano_saude_id" name="paciente[plano_saude_id]" <?= $disabledAttribute ?>>
+                            <option value="">Nenhum / Particular</option>
+                            <?php 
+                                $planos = $aDados['planos_saude'] ?? [];
+                                $plano_selecionado_id = setValor("plano_saude_id", $aDados['paciente']['plano_saude_id'] ?? '');
+
+                                foreach ($planos as $plano):
+                            ?>
+                                <option value="<?= $plano['id'] ?>" <?= ($plano['id'] == $plano_selecionado_id) ? 'selected' : '' ?>>
+                                    <?php // CORRIGIDO: Usa 'nome_plano' para exibir o texto da opção ?>
+                                    <?= htmlspecialchars($plano['nome_plano']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                </select>
+                <!-- FIM DA ALTERAÇÃO -->
             </div>
         </div>
-        
-        <div class="card shadow-sm border-0 rounded-3">
-            <div class="card-header bg-white py-3"><h5 class="card-title fw-bold mb-0">Status do Paciente</h5></div>
-            <div class="card-body py-4">
-                <?php if ($action !== 'insert') : ?>
-                    <div class="col-12 col-md-6">
-                        <label for="status" class="form-label font-semibold">Status <span class="text-danger">*</span></label>
-                        <select class="form-select form-select-custom" id="status" name="paciente[status]" required <?= $disabledAttribute ?>>
-                            <option value="1" <?= (setValor("status", $aDados['paciente']['status'] ?? '1') == "1" ? 'SELECTED' : '') ?>>Ativo</option>
-                            <option value="0" <?= (setValor("status", $aDados['paciente']['status'] ?? '') == "0" ? 'SELECTED' : '') ?>>Inativo</option>
-                        </select>
-                    </div>
-                <?php else: ?>
-                    <input type="hidden" name="paciente[status]" value="1">
-                    <p>Status: <span class="badge bg-success">Ativo</span> (será salvo automaticamente para novos pacientes)</p>
-                <?php endif; ?>
-            </div>
+        <div class="col-12 col-md-6">
+            <label for="status" class="form-label font-semibold">Status <span class="text-danger">*</span></label>
+            <select
+                id="status"
+                name="paciente[status]"
+                class="form-select form-select-custom"
+                required <?= $disabledAttribute ?>>
+                <?php 
+                // valores possíveis: 1 = Ativo, 0 = Inativo
+                $statusAtual = (int)($aDados['paciente']['status'] ?? 1);
+                ?>
+                <option value="1" <?= $statusAtual === 1 ? 'selected' : '' ?>>Ativo</option>
+                <option value="0" <?= $statusAtual === 0 ? 'selected' : '' ?>>Inativo</option>
+            </select>
+            <?= setMsgFilderError("status") ?>
         </div>
 
-        <div class="d-flex justify-content-end mt-4">
-            <a href="<?= baseUrl() ?>Paciente" class="btn btn-outline-secondary-custom">Cancelar</a>
-            <?php if (!$isViewMode) : ?>
-                <button type="submit" class="btn btn-custom-primary ms-3"><i class="bi bi-save me-2"></i> Salvar</button>
-            <?php endif; ?>
+
+        <div class="row g-4 mt-1">
+            <div class="col-12">
+                <label class="form-label font-semibold">Histórico Clínico / Observações</label>
+                <textarea class="form-control form-control-custom" name="paciente[historico_clinico]" rows="4" <?= $disabledAttribute ?>><?= setValor("historico_clinico", $aDados['paciente']['historico_clinico'] ?? '') ?></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-custom-primary btn-sm">
+                <i class="bi bi-save me-2"></i> Salvar
+            </button>
         </div>
     </form>
 </div>

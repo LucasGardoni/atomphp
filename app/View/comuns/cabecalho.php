@@ -84,6 +84,7 @@ use Core\Library\Session;
                                 <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 animated-dropdown">
                                     <li><a class="dropdown-item" href="<?= baseUrl() ?>Paciente">Listar Pacientes</a></li>
                                     <li><a class="dropdown-item" href="<?= baseUrl() ?>Paciente/form/insert/0">Novo Paciente</a></li>
+                                    <li><a class="dropdown-item" href="<?= baseUrl() ?>PlanoSaude">Plano Saude</a></li>
                                 </ul>
                             </li>
                             <li class="nav-item dropdown me-2">

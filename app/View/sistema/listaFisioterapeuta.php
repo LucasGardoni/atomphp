@@ -83,9 +83,9 @@
                                             <a href="<?= baseUrl() ?>Fisioterapeuta/form/update/<?= $fisio['id'] ?>" title="Alterar" class="action-icon-link text-indigo-500">
                                                 <i class="bi bi-pencil-square w-5 h-5"></i>
                                             </a>
-                                            <a href="<?= baseUrl() ?>Fisioterapeuta/form/delete/<?= $fisio['id'] ?>" title="Excluir" class="action-icon-link text-red-500">
-                                                <i class="bi bi-trash w-5 h-5"></i>
-                                            </a>
+                                               <a href="<?= baseUrl() ?>Fisioterapeuta/delete/delete/<?= $fisio['id'] ?>" title="Excluir" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este fisioterapeuta? A ação não poderá ser desfeita.');">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
                                         </div>
                                     </td>
                                 </tr>

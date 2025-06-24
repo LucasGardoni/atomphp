@@ -54,7 +54,10 @@ class Fisioterapeuta extends ControllerMain
         
         // Busca todas as especialidades disponíveis para montar os checkboxes
         $especialidadeModel = new EspecialidadeModel();
-        $aDados['todas_especialidades'] = $especialidadeModel->findAll();
+        $aDados['todas_especialidades'] = $especialidadeModel
+            ->db
+            ->orderBy('nome', 'ASC')
+            ->findAll();
         
         $this->loadView('sistema/formFisioterapeuta', $aDados);
     }
@@ -63,23 +66,29 @@ class Fisioterapeuta extends ControllerMain
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $post = $this->request->getPost();
-            $especialidadesIds = $post['especialidades'] ?? [];
             
-            // Remove as especialidades do array principal para não dar erro ao inserir o fisioterapeuta
-            unset($post['especialidades']);
+            // 1. Separa os dados corretamente
+            $especialidadesIds = $post['especialidades'] ?? [];
+            $fisioterapeutaData = $post; // Copia todos os dados do post
+            
+            // 2. Remove o que não pertence à tabela 'fisioterapeutas'
+            unset($fisioterapeutaData['especialidades']);
+            unset($fisioterapeutaData['id']); // Remove o ID vazio para a inserção
 
-            // 1. Insere os dados principais do fisioterapeuta e pega o ID
-            $fisioterapeutaId = $this->fisioterapeutaModel->insert($post, false);
+            // 3. Insere os dados APENAS do fisioterapeuta e pega o ID retornado
+            $fisioterapeutaId = $this->fisioterapeutaModel->insert($fisioterapeutaData, false);
 
-            if ($fisioterapeutaId) {
-                // 2. Se o fisioterapeuta foi salvo, salva as especialidades associadas
+            if ($fisioterapeutaId > 0) {
+                // 4. Com o novo ID, salva as especialidades associadas
                 $this->fisioterapeutaModel->salvarEspecialidades($fisioterapeutaId, $especialidadesIds);
                 Redirect::page('Fisioterapeuta', ["msgSucesso" => "Fisioterapeuta salvo com sucesso."]);
             } else {
+                Session::set('old_form_data', $post);
                 Redirect::page('Fisioterapeuta/form/insert', ["msgError" => "Falha ao salvar os dados do fisioterapeuta."]);
             }
         }
     }
+    
     
     public function update(): void
     {
@@ -98,6 +107,37 @@ class Fisioterapeuta extends ControllerMain
             } else {
                 Redirect::page('Fisioterapeuta/form/update/' . $fisioterapeutaId, ["msgError" => "Falha ao atualizar os dados do fisioterapeuta."]);
             }
+        }
+    }
+
+
+        public function delete(string $action = '0', int $id = 0): void
+    {
+        if ($id <= 0) {
+            Redirect::page($this->controller, ["msgError" => "ID inválido."]);
+            return;
+        }
+
+
+        if ($this->model->verificarVinculoSessaoAgendada($id)) {
+            $mensagem = "Não é possível excluir: este profissional possui sessões agendadas. Por favor, altere ou cancele os agendamentos primeiro.";
+            Redirect::page($this->controller, ["msgError" => $mensagem]);
+            return;
+        }
+
+        // 2. Se não houver vínculo, prossegue com a exclusão
+        try {
+            // Remove as associações de especialidades primeiro
+            $this->model->salvarEspecialidades($id, []);
+            
+            // Deleta o registro principal do fisioterapeuta
+            if ($this->model->delete($id)) {
+                Redirect::page($this->controller, ["msgSucesso" => "Fisioterapeuta excluído com sucesso."]);
+            } else {
+                throw new \Exception("Falha na exclusão do registro principal.");
+            }
+        } catch (\Exception $e) {
+            Redirect::page($this->controller, ["msgError" => "Erro ao excluir o fisioterapeuta."]);
         }
     }
 }

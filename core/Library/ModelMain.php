@@ -87,11 +87,6 @@ class ModelMain
             // Tenta executar a atualização no banco de dados.
             $resultado = $this->db->where($this->primaryKey, $dados[$this->primaryKey])->update($dados);
 
-            // ---- INÍCIO DA CORREÇÃO ----
-            // A verificação foi alterada de '> 0' para '!== false'.
-            // Isso considera a operação um sucesso mesmo que 0 linhas sejam alteradas
-            // (o que acontece quando você salva sem modificar os dados).
-            // A operação só será considerada uma falha se o banco retornar um erro explícito (false).
             if ($resultado !== false) {
                 return true;
             } else {
@@ -107,12 +102,19 @@ class ModelMain
      * @param array $dados 
      * @return bool
      */
-    public function delete($dados)
+  
+
+      public function delete($dados)
     {
-        if ($this->db->where($this->primaryKey, $dados[$this->primaryKey])->delete() > 0) {
-            return true;
-        } else {
-            return false;
+        $id = is_array($dados) ? ($dados[$this->primaryKey] ?? 0) : $dados;
+
+        if ($id > 0) {
+           
+            if ($this->db->where($this->primaryKey, $id)->delete() > 0) {
+                return true;
+            }
         }
+        
+        return false;
     }
 }

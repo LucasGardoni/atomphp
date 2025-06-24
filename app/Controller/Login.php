@@ -316,4 +316,58 @@ class Login extends ControllerMain
             }
         }
     }
+
+
+
+    /**
+ * GET/POST /Login/cadastrarLogin
+ */
+public function cadastrarLogin(): void
+{
+    // Se for GET, exibe o formulário
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        $this->loadView('login/cadastrarLogin', [
+            'msgError' => Session::get('msgError')
+        ]);
+        Session::destroy('msgError');
+        return;
+    }
+
+    // POST: processa o cadastro
+    $post = $this->request->getPost();
+    $errors = [];
+
+    // ... suas validações aqui ...
+
+    // Se houver erros, redireciona de volta com mensagens
+    if (!empty($errors)) {
+        Session::set('msgError', 'Corrija os erros abaixo.');
+        Session::set('inputs', $post);
+        Session::set('errors', $errors);
+        Redirect::page('Login/cadastrarLogin');  // <— sem "return"
+        return;
+    }
+
+    // Prepara dados para inserir
+    $dados = [
+        'nome'           => trim($post['nome']),
+        'email'          => trim($post['email']),
+        'senha'          => password_hash($post['senha'], PASSWORD_DEFAULT),
+        'nivel'          => 2,
+        'statusRegistro' => 1
+    ];
+
+    // Tenta inserir
+    if ($this->model->insert($dados)) {
+        Redirect::page('Login', ['msgSucesso' => 'Usuário cadastrado com sucesso!']); 
+        return;
+    } else {
+        Redirect::page('Login/cadastrarLogin', ['msgError' => 'Falha ao cadastrar. Tente novamente.']);  
+        return;
+    }
+}
+
+
+
+    
 }

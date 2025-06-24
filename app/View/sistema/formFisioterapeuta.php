@@ -100,7 +100,7 @@ $especialidadesSelecionadas = $aDados['especialidades_selecionadas'] ?? [];
                                                    <?= in_array($especialidade['id'], $especialidadesSelecionadas) ? 'checked' : '' ?>
                                                    <?= $disabledAttribute ?>>
                                             <label class="form-check-label text-gray-800" for="especialidade_<?= $especialidade['id'] ?>">
-                                                <?= htmlspecialchars($especialidade['nome']) // Supondo que o nome da coluna seja 'nome' ?>
+                                                <?= htmlspecialchars($especialidade['nome'])  ?>
                                             </label>
                                         </div>
                                     </div>
