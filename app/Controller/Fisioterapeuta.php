@@ -5,12 +5,16 @@ namespace App\Controller;
 use Core\Library\ControllerMain;
 use Core\Library\Redirect;
 use Core\Library\Session;
+use App\Model\FisioterapeutaModel;
 use App\Model\EspecialidadeModel;
 
 class Fisioterapeuta extends ControllerMain
 {
+    private $fisioterapeutaModel;
+
     public function __construct()
     {
+        $this->fisioterapeutaModel = new FisioterapeutaModel();
         $this->auxiliarconstruct();
         $this->loadHelper('formHelper');
     }
@@ -33,91 +37,66 @@ class Fisioterapeuta extends ControllerMain
                 break;
         }
         $this->loadView("sistema/listaFisioterapeuta", $aDados);
-    }
 
+    }
+    
     public function form(string $action = 'insert', int $id = 0): void
     {
         $aDados['action'] = $action;
-        $aDados['fisioterapeuta'] = $this->model->getById($id);
-        
-        $especialidadeModel = new EspecialidadeModel();
-        $aDados['lista_especialidades'] = $especialidadeModel->lista('nome');
+        $aDados['fisioterapeuta'] = null;
+        $aDados['especialidades_selecionadas'] = []; // Array para guardar as especialidades marcadas
 
-        $aDados['especialidades_atuais'] = [];
-        if ($id > 0) {
-            $aDados['especialidades_atuais'] = $this->model->getEspecialidades($id);
+        if ($action !== 'insert' && $id > 0) {
+            $aDados['fisioterapeuta'] = $this->fisioterapeutaModel->getById($id);
+            // Busca os IDs das especialidades que já estão salvas para este fisio
+            $aDados['especialidades_selecionadas'] = $this->fisioterapeutaModel->getEspecialidadesIds($id);
         }
         
-        $aDados['titulo'] = ($action === 'update') ? 'Editar Fisioterapeuta' : 'Novo Fisioterapeuta';
-        $this->loadView("sistema/formFisioterapeuta", $aDados);
+        // Busca todas as especialidades disponíveis para montar os checkboxes
+        $especialidadeModel = new EspecialidadeModel();
+        $aDados['todas_especialidades'] = $especialidadeModel->findAll();
+        
+        $this->loadView('sistema/formFisioterapeuta', $aDados);
     }
-
-    /**
-     * Processa a inserção de um novo fisioterapeuta e suas especialidades.
-     */
+    
     public function insert(): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $post = $this->request->getPost();
+            $especialidadesIds = $post['especialidades'] ?? [];
             
-            $especialidadesSelecionadas = $post['especialidades'] ?? [];
+            // Remove as especialidades do array principal para não dar erro ao inserir o fisioterapeuta
             unset($post['especialidades']);
-            if (empty($post['id'])) { unset($post['id']); }
 
-            try {
-                // Tenta inserir o fisioterapeuta
-                $fisioterapeutaSalvo = $this->model->insert($post);
+            // 1. Insere os dados principais do fisioterapeuta e pega o ID
+            $fisioterapeutaId = $this->fisioterapeutaModel->insert($post, false);
 
-                if ($fisioterapeutaSalvo) {
-                    // Se o insert principal funcionou, busca o novo ID pelo CREFITO
-                    $novoFisio = $this->model->getByCrefito($post['crefito']);
-                    if ($novoFisio) {
-                        // Com o ID, salva as especialidades
-                        $this->model->salvarEspecialidades($novoFisio['id'], $especialidadesSelecionadas);
-                        Redirect::page($this->controller, ["msgSucesso" => "Fisioterapeuta salvo com sucesso."]);
-                    } else {
-                        Redirect::page($this->controller, ["msgError" => "Fisioterapeuta salvo, mas houve um erro ao associar especialidades."]);
-                    }
-                } else {
-                    // Falha na validação ou na inserção principal (sem erro de exceção)
-                    Redirect::page($this->controller . "/form/insert/0", ["msgError" => "Falha ao salvar. Verifique os dados. (Causa: Validação)"]);
-                }
-            } catch (\PDOException $e) {
-                // ---- CAPTURA DO ERRO DO BANCO DE DADOS ----
-                // Se a query INSERT falhar, uma exceção PDO será capturada aqui.
-                echo "<h1>Erro do Banco de Dados</h1>";
-                echo "<p>A gravação falhou por um erro de SQL. Verifique se os dados violam alguma regra do banco (como CPF ou CREFITO duplicado).</p>";
-                echo "<hr>";
-                echo "<p><strong>Mensagem do Erro:</strong></p>";
-                echo "<pre>";
-                var_dump($e->getMessage());
-                echo "</pre>";
-                exit; // Para a execução para podermos ver o erro.
+            if ($fisioterapeutaId) {
+                // 2. Se o fisioterapeuta foi salvo, salva as especialidades associadas
+                $this->fisioterapeutaModel->salvarEspecialidades($fisioterapeutaId, $especialidadesIds);
+                Redirect::page('Fisioterapeuta', ["msgSucesso" => "Fisioterapeuta salvo com sucesso."]);
+            } else {
+                Redirect::page('Fisioterapeuta/form/insert', ["msgError" => "Falha ao salvar os dados do fisioterapeuta."]);
             }
         }
     }
-
-    /**
-     * Processa a atualização de um fisioterapeuta e suas especialidades.
-     */
+    
     public function update(): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $post = $this->request->getPost();
             $fisioterapeutaId = $post['id'];
-            
-            // Separa os IDs das especialidades
-            $especialidadesSelecionadas = $post['especialidades'] ?? [];
+            $especialidadesIds = $post['especialidades'] ?? [];
+
             unset($post['especialidades']);
 
-            // 1. Atualiza os dados principais
-            // Usamos '!== false' para o caso de a atualização não alterar nenhuma linha (0 rows affected)
-            if ($this->model->update($post) !== false) {
-                // 2. Atualiza as associações de especialidades
-                $this->model->salvarEspecialidades($fisioterapeutaId, $especialidadesSelecionadas);
-                Redirect::page($this->controller, ["msgSucesso" => "Fisioterapeuta atualizado com sucesso."]);
+            // 1. Atualiza os dados principais do fisioterapeuta
+            if ($this->fisioterapeutaModel->update($post) !== false) {
+                // 2. Atualiza as especialidades associadas
+                $this->fisioterapeutaModel->salvarEspecialidades($fisioterapeutaId, $especialidadesIds);
+                Redirect::page('Fisioterapeuta', ["msgSucesso" => "Fisioterapeuta atualizado com sucesso."]);
             } else {
-                Redirect::page($this->controller . "/form/update/" . $fisioterapeutaId, ["msgError" => "Falha ao atualizar."]);
+                Redirect::page('Fisioterapeuta/form/update/' . $fisioterapeutaId, ["msgError" => "Falha ao atualizar os dados do fisioterapeuta."]);
             }
         }
     }
