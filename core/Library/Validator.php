@@ -99,15 +99,10 @@ class Validator
     }
 }
 
-/**
- * Função helper para validar datas.
- * Adicionada aqui para resolver o erro 'Call to undefined function'.
- */
 if (!function_exists('validateDate')) {
     function validateDate($date, $format = 'Y-m-d H:i:s') {
-        // Cria um objeto DateTime a partir do formato especificado
         $d = DateTime::createFromFormat($format, $date);
-        // Verifica se a criação foi bem-sucedida E se a data formatada de volta é igual à original
         return $d && $d->format($format) == $date;
     }
 }
+

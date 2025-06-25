@@ -1,12 +1,12 @@
-<link rel="stylesheet" href="<?= baseUrl() ?>assets/css/form.css">
+<link rel="stylesheet" href="<?= baseUrl() ?>assets/css/formSessao.css">
 <?php
 $action       = $aDados['action'] ?? 'insert';
 $isViewMode   = ($action === 'view');
 $disabledAttr = $isViewMode ? 'disabled' : '';
 $formTitle    = $aDados['titulo']
-    ?? ($action==='insert' ? 'Agendar Nova Sessão'
-      :($action==='update' ? 'Editar Sessão Agendada'
-      :'Visualizar Detalhes da Sessão'));
+  ?? ($action === 'insert' ? 'Agendar Nova Sessão'
+    : ($action === 'update' ? 'Editar Sessão Agendada'
+      : 'Visualizar Detalhes da Sessão'));
 $sessao       = $aDados['sessao'] ?? [];
 ?>
 <div class="space-y-6 container py-4">
@@ -34,9 +34,9 @@ $sessao       = $aDados['sessao'] ?? [];
               Fisioterapeuta <span class="text-danger">*</span>
             </label>
             <select id="fisioterapeuta_id" name="sessao[fisioterapeuta_id]"
-                    class="form-select" required <?= $disabledAttr ?>>
+              class="form-select" required <?= $disabledAttr ?>>
               <option value="">Selecione...</option>
-              <?php foreach($aDados['lista_fisioterapeutas'] as $f): ?>
+              <?php foreach ($aDados['lista_fisioterapeutas'] as $f): ?>
                 <option value="<?= $f['id'] ?>"
                   <?= ($sessao['fisioterapeuta_id'] ?? '') == $f['id'] ? 'selected' : '' ?>>
                   <?= htmlspecialchars($f['nome']) ?>
@@ -50,9 +50,9 @@ $sessao       = $aDados['sessao'] ?? [];
               Paciente <span class="text-danger">*</span>
             </label>
             <select id="paciente_id" name="sessao[paciente_id]"
-                    class="form-select" required <?= $disabledAttr ?>>
+              class="form-select" required <?= $disabledAttr ?>>
               <option value="">Selecione...</option>
-              <?php foreach($aDados['lista_pacientes'] as $p): ?>
+              <?php foreach ($aDados['lista_pacientes'] as $p): ?>
                 <option value="<?= $p['id'] ?>"
                   <?= ($sessao['paciente_id'] ?? '') == $p['id'] ? 'selected' : '' ?>>
                   <?= htmlspecialchars($p['nome']) ?>
@@ -69,16 +69,16 @@ $sessao       = $aDados['sessao'] ?? [];
               Data do Agendamento <span class="text-danger">*</span>
             </label>
             <input type="date" id="data_selecionada" name="sessao[data_selecionada]"
-                   class="form-control" required <?= $disabledAttr ?>
-                   value="<?= $sessao['data_selecionada'] ?? '' ?>">
+              class="form-control" required <?= $disabledAttr ?>
+              value="<?= $sessao['data_selecionada'] ?? '' ?>">
           </div>
           <div class="col-md-8">
             <label class="form-label">
               Horários Disponíveis <span class="text-danger">*</span>
             </label>
             <div id="horarios-container"
-                 class="p-3 rounded bg-light-subtle d-flex flex-wrap gap-2"
-                 style="min-height:58px;">
+              class="p-3 rounded bg-light-subtle d-flex flex-wrap gap-2"
+              style="min-height:58px;">
               <small class="text-muted">Selecione um fisioterapeuta e data.</small>
             </div>
             <?= setMsgFilderError("data_hora_agendamento") ?>
@@ -86,7 +86,7 @@ $sessao       = $aDados['sessao'] ?? [];
         </div>
 
         <input type="hidden" name="sessao[data_hora_agendamento]" id="data_hora_agendamento"
-               value="<?= $sessao['data_hora_agendamento'] ?? '' ?>">
+          value="<?= $sessao['data_hora_agendamento'] ?? '' ?>">
 
         <hr class="my-5">
 
@@ -96,9 +96,9 @@ $sessao       = $aDados['sessao'] ?? [];
             <div class="col-md-4">
               <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox"
-                       id="is_recorrente" name="sessao[is_recorrente]"
-                       <?= !empty($sessao['is_recorrente'])?'checked':'' ?>
-                       <?= $disabledAttr ?>>
+                  id="is_recorrente" name="sessao[is_recorrente]"
+                  <?= !empty($sessao['is_recorrente']) ? 'checked' : '' ?>
+                  <?= $disabledAttr ?>>
                 <label class="form-check-label" for="is_recorrente">
                   Repetir sessão
                 </label>
@@ -109,10 +109,10 @@ $sessao       = $aDados['sessao'] ?? [];
                 Repetir a cada:
               </label>
               <select id="tipo_recorrencia" name="sessao[tipo_recorrencia]"
-                      class="form-select" <?= $disabledAttr ?>>
-                <?php foreach(['diariamente'=>'Dia','semanalmente'=>'Semana','quinzenalmente'=>'15 dias','mensalmente'=>'Mês'] as $k=>$v): ?>
+                class="form-select" <?= $disabledAttr ?>>
+                <?php foreach (['diariamente' => 'Dia', 'semanalmente' => 'Semana', 'quinzenalmente' => '15 dias', 'mensalmente' => 'Mês'] as $k => $v): ?>
                   <option value="<?= $k ?>"
-                    <?= ($sessao['tipo_recorrencia'] ?? '')===$k?'selected':''?>>
+                    <?= ($sessao['tipo_recorrencia'] ?? '') === $k ? 'selected' : '' ?>>
                     <?= $v ?>
                   </option>
                 <?php endforeach; ?>
@@ -123,9 +123,9 @@ $sessao       = $aDados['sessao'] ?? [];
                 Nº de repetições
               </label>
               <input type="number" id="quantidade_repeticoes" name="sessao[quantidade_repeticoes]"
-                     class="form-control" min="1" max="52"
-                     value="<?= $sessao['quantidade_repeticoes'] ?? 8 ?>"
-                     <?= $disabledAttr ?>>
+                class="form-control" min="1" max="52"
+                value="<?= $sessao['quantidade_repeticoes'] ?? 8 ?>"
+                <?= $disabledAttr ?>>
             </div>
           </div>
         </div>
@@ -136,8 +136,8 @@ $sessao       = $aDados['sessao'] ?? [];
               Tipo de Tratamento <span class="text-danger">*</span>
             </label>
             <select id="tipo_tratamento" name="sessao[tipo_tratamento]"
-                    class="form-select" required <?= $disabledAttr ?>>
-              <!-- preenchido pelo JS -->
+              class="form-select" required <?= $disabledAttr ?>>
+
             </select>
             <?= setMsgFilderError("tipo_tratamento") ?>
           </div>
@@ -146,9 +146,9 @@ $sessao       = $aDados['sessao'] ?? [];
               Status <span class="text-danger">*</span>
             </label>
             <select id="status_sessao" name="sessao[status_sessao]"
-                    class="form-select" required <?= $disabledAttr ?>>
+              class="form-select" required <?= $disabledAttr ?>>
               <option value="Agendada"
-                <?= ($sessao['status_sessao'] ?? '')==='Agendada'?'selected':'' ?>>
+                <?= ($sessao['status_sessao'] ?? '') === 'Agendada' ? 'selected' : '' ?>>
                 Agendada
               </option>
             </select>
@@ -160,7 +160,7 @@ $sessao       = $aDados['sessao'] ?? [];
           <?php if (!$isViewMode): ?>
             <button type="submit" class="btn btn-custom-primary" id="btn-salvar-sessao">
               <i class="bi bi-check-lg me-2"></i>
-              <?= $action==='insert'?'Agendar':'Atualizar' ?> Sessão
+              <?= $action === 'insert' ? 'Agendar' : 'Atualizar' ?> Sessão
             </button>
           <?php endif; ?>
           <a href="<?= baseUrl() ?>Sessao/index" class="btn btn-custom-secondary">
@@ -174,101 +174,98 @@ $sessao       = $aDados['sessao'] ?? [];
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const fisioSelect = document.getElementById('fisioterapeuta_id');
-  const dataInput   = document.getElementById('data_selecionada');
-  const horariosCt  = document.getElementById('horarios-container');
-  const dataHoraIn  = document.getElementById('data_hora_agendamento');
-  const btnSalvar   = document.getElementById('btn-salvar-sessao');
-  const tratSelect  = document.getElementById('tipo_tratamento');
-  const sessao      = <?= json_encode($sessao) ?>;
-  const initFisio   = sessao.fisioterapeuta_id || '';
-  const initTrat    = sessao.tipo_tratamento    || '';
+  document.addEventListener('DOMContentLoaded', function() {
+    const fisioSelect = document.getElementById('fisioterapeuta_id');
+    const dataInput = document.getElementById('data_selecionada');
+    const horariosCt = document.getElementById('horarios-container');
+    const dataHoraIn = document.getElementById('data_hora_agendamento');
+    const btnSalvar = document.getElementById('btn-salvar-sessao');
+    const tratSelect = document.getElementById('tipo_tratamento');
+    const sessao = <?= json_encode($sessao) ?>;
+    const initFisio = sessao.fisioterapeuta_id || '';
+    const initTrat = sessao.tipo_tratamento || '';
 
-  if (btnSalvar) btnSalvar.disabled = true;
-
-  // 1) Horários disponíveis
-  function buscarHorarios() {
-    const fisio = fisioSelect.value, data = dataInput.value;
-    dataHoraIn.value = '';
     if (btnSalvar) btnSalvar.disabled = true;
-    if (!fisio || !data) {
-      horariosCt.innerHTML = '<small class="text-muted">Selecione um fisioterapeuta e uma data.</small>';
-      return;
-    }
-    horariosCt.innerHTML = 'Carregando horários...';
-    fetch(`<?= baseUrl() ?>Sessao/getHorariosDisponiveis?fisioterapeuta_id=${fisio}&data=${data}`)
-      .then(res => res.json())
-      .then(list => {
-        horariosCt.innerHTML = '';
-        if (list.erro || list.length === 0) {
-          horariosCt.innerHTML = `<span class="text-danger">${list.erro || 'Sem horários disponíveis.'}</span>`;
-        } else {
-          list.forEach(h => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'btn btn-outline-success m-1';
-            btn.textContent = h;
-            btn.addEventListener('click', () => {
-              horariosCt.querySelectorAll('button').forEach(x =>
-                x.classList.replace('btn-success','btn-outline-success')
-              );
-              btn.classList.replace('btn-outline-success','btn-success');
-              dataHoraIn.value = `${data} ${h}:00`;
-              btnSalvar.disabled = false;
+
+    function buscarHorarios() {
+      const fisio = fisioSelect.value,
+        data = dataInput.value;
+      dataHoraIn.value = '';
+      if (btnSalvar) btnSalvar.disabled = true;
+      if (!fisio || !data) {
+        horariosCt.innerHTML = '<small class="text-muted">Selecione um fisioterapeuta e uma data.</small>';
+        return;
+      }
+      horariosCt.innerHTML = 'Carregando horários...';
+      fetch(`<?= baseUrl() ?>Sessao/getHorariosDisponiveis?fisioterapeuta_id=${fisio}&data=${data}`)
+        .then(res => res.json())
+        .then(list => {
+          horariosCt.innerHTML = '';
+          if (list.erro || list.length === 0) {
+            horariosCt.innerHTML = `<span class="text-danger">${list.erro || 'Sem horários disponíveis.'}</span>`;
+          } else {
+            list.forEach(h => {
+              const btn = document.createElement('button');
+              btn.type = 'button';
+              btn.className = 'btn btn-outline-success m-1';
+              btn.textContent = h;
+              btn.addEventListener('click', () => {
+                horariosCt.querySelectorAll('button').forEach(x =>
+                  x.classList.replace('btn-success', 'btn-outline-success')
+                );
+                btn.classList.replace('btn-outline-success', 'btn-success');
+                dataHoraIn.value = `${data} ${h}:00`;
+                btnSalvar.disabled = false;
+              });
+              horariosCt.appendChild(btn);
             });
-            horariosCt.appendChild(btn);
-          });
-        }
-      })
-      .catch(() => {
-        horariosCt.innerHTML = '<span class="text-danger">Erro ao buscar horários.</span>';
-      });
-  }
-
-  // 2) Especialidades como tipo_tratamento
-  function carregarEspecialidades(fisioId, sel = '') {
-    tratSelect.innerHTML = '';
-    if (!fisioId) {
-      tratSelect.innerHTML = '<option value="">Selecione o fisioterapeuta</option>';
-      return;
-    }
-    const url = `<?= baseUrl() ?>Sessao/getEspecialidadesPorFisioterapeuta?fisioterapeuta_id=${fisioId}`;
-    console.log('Fetch especialidades:', url);
-
-    fetch(url)
-      .then(res => {
-        console.log('Status especialidades:', res.status, res.statusText);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then(list => {
-        tratSelect.innerHTML = '';
-        list.forEach(o => {
-          const opt = document.createElement('option');
-          opt.value       = o.id;
-          opt.textContent = o.nome;
-          if (o.id == sel) opt.selected = true;
-          tratSelect.appendChild(opt);
+          }
+        })
+        .catch(() => {
+          horariosCt.innerHTML = '<span class="text-danger">Erro ao buscar horários.</span>';
         });
-      })
-      .catch(err => {
-        console.error('Erro ao carregar especialidades:', err);
-        tratSelect.innerHTML = '<option value="">Erro ao carregar opções</option>';
-      });
-  }
+    }
 
-  // Eventos
-  fisioSelect.addEventListener('change', () => {
-    carregarEspecialidades(fisioSelect.value);
-    buscarHorarios();
+    function carregarEspecialidades(fisioId, sel = '') {
+      tratSelect.innerHTML = '';
+      if (!fisioId) {
+        tratSelect.innerHTML = '<option value="">Selecione o fisioterapeuta</option>';
+        return;
+      }
+      const url = `<?= baseUrl() ?>Sessao/getEspecialidadesPorFisioterapeuta?fisioterapeuta_id=${fisioId}`;
+      console.log('Fetch especialidades:', url);
+
+      fetch(url)
+        .then(res => {
+          console.log('Status especialidades:', res.status, res.statusText);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        })
+        .then(list => {
+          tratSelect.innerHTML = '';
+          list.forEach(o => {
+            const opt = document.createElement('option');
+            opt.value = o.id;
+            opt.textContent = o.nome;
+            if (o.id == sel) opt.selected = true;
+            tratSelect.appendChild(opt);
+          });
+        })
+        .catch(err => {
+          console.error('Erro ao carregar especialidades:', err);
+          tratSelect.innerHTML = '<option value="">Erro ao carregar opções</option>';
+        });
+    }
+
+    fisioSelect.addEventListener('change', () => {
+      carregarEspecialidades(fisioSelect.value);
+      buscarHorarios();
+    });
+    dataInput.addEventListener('change', buscarHorarios);
+
+    if (initFisio) {
+      carregarEspecialidades(initFisio, initTrat);
+      buscarHorarios();
+    }
   });
-  dataInput.addEventListener('change', buscarHorarios);
-
-  // Inicialização em edição
-  if (initFisio) {
-    carregarEspecialidades(initFisio, initTrat);
-    buscarHorarios();
-  }
-});
 </script>

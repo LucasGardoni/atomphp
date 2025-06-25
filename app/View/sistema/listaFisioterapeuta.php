@@ -2,6 +2,7 @@
 
 
 <div class="space-y-6 container py-4">
+    <?= exibeAlerta() ?>
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="text-3xl font-bold text-gray-900 mb-1">Lista de Fisioterapeutas</h1>
@@ -83,9 +84,9 @@
                                             <a href="<?= baseUrl() ?>Fisioterapeuta/form/update/<?= $fisio['id'] ?>" title="Alterar" class="action-icon-link text-indigo-500">
                                                 <i class="bi bi-pencil-square w-5 h-5"></i>
                                             </a>
-                                               <a href="<?= baseUrl() ?>Fisioterapeuta/delete/delete/<?= $fisio['id'] ?>" title="Excluir" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este fisioterapeuta? A ação não poderá ser desfeita.');">
-                                                    <i class="bi bi-trash"></i>
-                                                </a>
+                                            <a href="<?= baseUrl() ?>Fisioterapeuta/delete/delete/<?= $fisio['id'] ?>" title="Excluir" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este fisioterapeuta? A ação não poderá ser desfeita.');">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>
@@ -109,4 +110,3 @@
         </div>
     </div>
 </div>
-

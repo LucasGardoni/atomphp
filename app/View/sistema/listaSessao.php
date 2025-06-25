@@ -1,6 +1,7 @@
 <link rel="stylesheet" href="<?= baseUrl() ?>assets/css/formSessao.css">
 
 <div class="space-y-6 container py-4">
+    <?= exibeAlerta() ?>
     <div class="d-flex align-items-center justify-content-between mb-4">
         <div>
             <h1 class="text-3xl font-bold text-gray-900 mb-1">Agenda de Sessões</h1>
@@ -44,7 +45,10 @@
                                         <a href="<?= baseUrl() ?>Sessao/form/update/<?= $sessao['id'] ?>" title="Alterar" class="btn btn-sm btn-outline-primary custom-btn-icon">
                                             <i class="bi bi-pencil-square"></i> <span class="d-none d-md-inline">Editar</span>
                                         </a>
-                                        </td>
+                                        <a href="<?= baseUrl() ?>Sessao/delete/delete/<?= $sessao['id'] ?>" title="Excluir" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir esta sessão? A ação não poderá ser desfeita.');">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -80,7 +84,7 @@ function getStatusBadgeClass(string $status): string
         case 'confirmada':
             return 'info';
         case 'pendente':
-            return 'warning text-dark'; 
+            return 'warning text-dark';
         default:
             return 'secondary';
     }

@@ -1,6 +1,8 @@
 <link rel="stylesheet" href="<?= baseUrl() ?>assets/css/lista.css">
 
+
 <div class="space-y-6 container py-4">
+    <?= exibeAlerta() ?>
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="text-3xl font-bold text-gray-900 mb-1">Lista de Pacientes</h1>
@@ -24,7 +26,7 @@
                         </label>
                         <select name="filtro_status" id="filtro_status" class="form-select form-select-custom">
                             <?php
-                                $filtroAtual = $aDados['filtro_atual'] ?? 'ativos';
+                            $filtroAtual = $aDados['filtro_atual'] ?? 'ativos';
                             ?>
                             <option value="ativos" <?= $filtroAtual === 'ativos' ? 'selected' : '' ?>>Apenas Ativos</option>
                             <option value="inativos" <?= $filtroAtual === 'inativos' ? 'selected' : '' ?>>Apenas Inativos</option>
@@ -46,8 +48,8 @@
             <h5 class="card-title fw-bold mb-0">Pacientes Cadastrados</h5>
         </div>
         <div class="card-body p-0"> <?php
-            $listaDePacientes = $aDados['pacientes'] ?? [];
-            ?>
+                                    $listaDePacientes = $aDados['pacientes'] ?? [];
+                                    ?>
 
             <?php if (isset($listaDePacientes) && count($listaDePacientes) > 0) : ?>
                 <div class="table-responsive">
@@ -80,8 +82,8 @@
                                             <a href="<?= baseUrl() ?>Paciente/form/update/<?= htmlspecialchars($paciente['id'] ?? '') ?>" title="Alterar" class="action-icon-link text-indigo-500">
                                                 <i class="bi bi-pencil-square w-5 h-5"></i>
                                             </a>
-                                            <a href="<?= baseUrl() ?>Paciente/form/delete/<?= htmlspecialchars($paciente['id'] ?? '') ?>" title="Excluir" class="action-icon-link text-red-500">
-                                                <i class="bi bi-trash w-5 h-5"></i>
+                                            <a href="<?= baseUrl() ?>Paciente/delete/delete/<?= htmlspecialchars($paciente['id'] ?? '') ?>" title="Excluir" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este paciente? A ação não poderá ser desfeita.');">
+                                                <i class="bi bi-trash"></i>
                                             </a>
                                         </div>
                                     </td>

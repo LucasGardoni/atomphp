@@ -6,7 +6,7 @@
     </div>
     <div class="card-body">
 
-        <form action="<?= baseUrl() ?>login/atualizaRecuperaSenha" method="POST" id="recuperaSenhaform" class="form-horizontal" role="form" >
+        <form action="<?= baseUrl() ?>login/atualizaRecuperaSenha" method="POST" id="recuperaSenhaform" class="form-horizontal" role="form">
 
             <input type="hidden" name="id" id="id" value="<?= $dados['id'] ?>">
             <input type="hidden" name="usuariorecuperasenha_id" id="usuariorecuperasenha_id" value="<?= $dados['usuariorecuperasenha_id'] ?>">
@@ -20,13 +20,13 @@
             <div class="control-group mt-3">
                 <span class="input-group-addon"><i class="fa fa-key"></i> Nova Senha</span>
                 <div class="controls mt-2">
-                    <input type="password" class="form-control" 
-                            id="NovaSenha" 
-                            name="NovaSenha" 
-                            required
-                            placeholder="Nova senha" 
-                            onkeyup="checa_segur_senha( 'NovaSenha', 'msgSenhaNova', 'btEnviar' );"
-                            autofocus>
+                    <input type="password" class="form-control"
+                        id="NovaSenha"
+                        name="NovaSenha"
+                        required
+                        placeholder="Nova senha"
+                        onkeyup="checa_segur_senha( 'NovaSenha', 'msgSenhaNova', 'btEnviar' );"
+                        autofocus>
                     <div id="msgSenhaNova" class="mt-2 mb-3"></div>
                 </div>
             </div>
@@ -34,12 +34,12 @@
             <div class="control-group mb-3">
                 <span class="input-group-addon"><i class="fa fa-key"></i> Confirme a nova senha</span>
                 <div class="controls mt-2">
-                    <input type="password" class="form-control" 
-                            name="NovaSenha2" 
-                            id="NovaSenha2"     
-                            placeholder="Confirma nova senha" 
-                            required
-                            onkeyup="checa_segur_senha( 'NovaSenha2', 'msgSenhaNova2', 'btEnviar' );">
+                    <input type="password" class="form-control"
+                        name="NovaSenha2"
+                        id="NovaSenha2"
+                        placeholder="Confirma nova senha"
+                        required
+                        onkeyup="checa_segur_senha( 'NovaSenha2', 'msgSenhaNova2', 'btEnviar' );">
                     <div id="msgSenhaNova2" class="mt-2 mb-3"></div>
                 </div>
             </div>
@@ -55,6 +55,6 @@
 
             </div>
 
-        </form>     
-    </div>        
+        </form>
+    </div>
 </div>

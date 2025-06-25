@@ -1,6 +1,7 @@
 <link rel="stylesheet" href="<?= baseUrl() ?>assets/css/form.css">
 <?php
-    use Core\Library\Session;
+
+use Core\Library\Session;
 ?>
 
 <link rel="stylesheet" href="<?= baseUrl() ?>assets/css/formPaciente.css">
@@ -49,7 +50,7 @@
                             Nova Senha <span class="text-danger">*</span>
                         </label>
                         <input name="novaSenha" id="novaSenha" type="password" class="form-control form-control-custom" required="required"
-                               onkeyup="checa_segur_senha( 'novaSenha', 'msgSenhaNova', 'btEnviar' );">
+                            onkeyup="checa_segur_senha( 'novaSenha', 'msgSenhaNova', 'btEnviar' );">
                         <div id="msgSenhaNova" class="mt-3 text-sm text-gray-600"></div>
                     </div>
 
@@ -58,7 +59,7 @@
                             Confirme a Nova Senha <span class="text-danger">*</span>
                         </label>
                         <input name="novaSenha2" id="novaSenha2" type="password" class="form-control form-control-custom" placeholder="Digite a nova senha novamente" required="required"
-                               onkeyup="checa_segur_senha( 'novaSenha2', 'msgSenhaNova2', 'btEnviar' );">
+                            onkeyup="checa_segur_senha( 'novaSenha2', 'msgSenhaNova2', 'btEnviar' );">
                         <div id="msgSenhaNova2" class="mt-3 text-sm text-gray-600"></div>
                     </div>
                 </div>

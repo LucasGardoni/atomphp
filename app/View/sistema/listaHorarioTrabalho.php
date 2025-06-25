@@ -41,16 +41,16 @@ $pageTitle = $formTitle . ' - ' . htmlspecialchars($fisioterapeutaNome);
                         </thead>
                         <tbody>
                             <?php
-                            $dias = [
-                                1 => 'Segunda-feira',
-                                2 => 'Terça-feira',
-                                3 => 'Quarta-feira',
-                                4 => 'Quinta-feira',
-                                5 => 'Sexta-feira',
-                                6 => 'Sábado',
-                                7 => 'Domingo'
-                            ];
-                            foreach ($aDados['horarios'] as $horario):
+                                        $dias = [
+                                            1 => 'Segunda-feira',
+                                            2 => 'Terça-feira',
+                                            3 => 'Quarta-feira',
+                                            4 => 'Quinta-feira',
+                                            5 => 'Sexta-feira',
+                                            6 => 'Sábado',
+                                            7 => 'Domingo'
+                                        ];
+                                        foreach ($aDados['horarios'] as $horario):
                             ?>
                                 <tr>
                                     <td class="ps-4"><?= $dias[$horario['dia_semana']] ?></td>

@@ -82,9 +82,8 @@ class ModelMain
     public function update($dados)
     {
         if (Validator::make($dados, $this->validationRules)) {
-            return 0; // Se a validação falhar, retorna falso.
+            return 0; 
         } else {
-            // Tenta executar a atualização no banco de dados.
             $resultado = $this->db->where($this->primaryKey, $dados[$this->primaryKey])->update($dados);
 
             if ($resultado !== false) {
@@ -92,7 +91,6 @@ class ModelMain
             } else {
                 return false;
             }
-            // ---- FIM DA CORREÇÃO ----
         }
     }
 

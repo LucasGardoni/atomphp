@@ -9,7 +9,7 @@ class EnderecoModel extends ModelMain
     protected $table = 'enderecos';
 
     /**
-     * @var array REGRAS DE VALIDAÇÃO CORRIGIDAS PARA O INGLÊS
+     * @var array 
      */
     public $validationRules = [
         "cep" => ["label" => "CEP", "rules" => "required"],

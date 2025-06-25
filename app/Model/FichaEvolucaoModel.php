@@ -19,14 +19,6 @@ class FichaEvolucaoModel extends ModelMain
             "rules" => "obrigatorio"
         ],
     ];
-
-    /**
-     * Busca um registro de evolução pelo ID da sessão.
-     * Como só existe uma evolução por sessão, este método é mais útil que getById().
-     *
-     * @param int $sessao_id
-     * @return array|null
-     */
     public function getBySessaoId(int $sessao_id): ?array
     {
         return $this->db->where("sessao_id", $sessao_id)->first();

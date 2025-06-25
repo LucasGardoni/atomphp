@@ -25,24 +25,19 @@ class Sessao extends ControllerMain
         $this->loadView("sistema/listaSessao", $aDados);
     }
 
-    /**
-     * Decide qual formulário carregar: 'novo' ou 'editar'.
-     */
     public function form(string $action = 'insert', int $id = 0): void
     {
         $pacienteModel = new PacienteModel();
         $fisioterapeutaModel = new FisioterapeutaModel();
-        
+
         $aDados['lista_pacientes'] = $pacienteModel->listaPacientesAtivos();
         $aDados['lista_fisioterapeutas'] = $fisioterapeutaModel->listaFisioterapeutasAtivos();
         $aDados['action'] = $action;
 
         if ($action === 'insert') {
-            // Se for um novo agendamento, carrega a view com a busca de horários
             $aDados['titulo'] = 'Novo Agendamento';
             $this->loadView("sistema/formSessaoNovo", $aDados);
-
-        } else { // Cobre 'update' e 'view'
+        } else {
             $sessao = $this->model->getById($id);
             if (!$sessao) {
                 Session::set('msgError', 'Sessão não encontrada.');
@@ -51,18 +46,11 @@ class Sessao extends ControllerMain
             }
             $aDados['sessao'] = $sessao;
             $aDados['titulo'] = ($action === 'update') ? 'Editar Agendamento' : 'Visualizar Agendamento';
-            
-            // Se for uma edição/visualização, carrega a view mais simples
+
             $this->loadView("sistema/formSessaoEditar", $aDados);
         }
     }
-
-
- /**
- * GET /Sessao/getTratamentosPorFisioterapeuta?fisioterapeuta_id=X
- */
-
-public function getEspecialidadesPorFisioterapeuta(): void
+    public function getEspecialidadesPorFisioterapeuta(): void
     {
         header('Content-Type: application/json; charset=utf-8');
         try {
@@ -72,8 +60,6 @@ public function getEspecialidadesPorFisioterapeuta(): void
                 echo json_encode(['erro' => 'Fisioterapeuta inválido']);
                 exit;
             }
-
-            // Pega os IDs de especialidade
             $ids = (new FisioterapeutaModel())->getEspecialidadeIds($fisioId);
 
             $options = [
@@ -85,7 +71,7 @@ public function getEspecialidadesPorFisioterapeuta(): void
                 foreach ($lista as $e) {
                     $options[] = [
                         'id'   => $e['id'],
-                        'nome' => $e['nome'],   // usa o campo "nome" da sua tabela
+                        'nome' => $e['nome'],
                     ];
                 }
             }
@@ -94,7 +80,7 @@ public function getEspecialidadesPorFisioterapeuta(): void
             exit;
         } catch (\Throwable $e) {
             http_response_code(500);
-            // Para debug: retorna a mensagem de exceção em JSON
+
             echo json_encode([
                 'erro'  => 'Exception: ' . $e->getMessage(),
                 'trace' => $e->getTraceAsString()
@@ -103,9 +89,6 @@ public function getEspecialidadesPorFisioterapeuta(): void
         }
     }
 
-
-    
-    // O método getHorariosDisponiveis() permanece o mesmo que te enviei anteriormente
     public function getHorariosDisponiveis(): void
     {
         header('Content-Type: application/json');
@@ -128,7 +111,7 @@ public function getEspecialidadesPorFisioterapeuta(): void
                 ->where('fisioterapeuta_id', $fisioterapeuta_id)
                 ->where('dia_semana', $dia_semana)
                 ->findAll();
-            
+
             if (empty($blocos_trabalho)) {
                 echo json_encode([]);
                 return;
@@ -137,13 +120,13 @@ public function getEspecialidadesPorFisioterapeuta(): void
             $querySessoes = $this->model->db
                 ->where('fisioterapeuta_id', $fisioterapeuta_id)
                 ->where("DATE(data_hora_agendamento) = '{$data}'");
-            
+
             if ($ignorar_sessao_id > 0) {
                 $querySessoes->where("id !=", $ignorar_sessao_id);
             }
-            
+
             $sessoes_agendadas = $querySessoes->findAll();
-            
+
             $horarios_ocupados = [];
             foreach ($sessoes_agendadas as $sessao) {
                 $horarios_ocupados[] = date('H:i', strtotime($sessao['data_hora_agendamento']));
@@ -153,7 +136,7 @@ public function getEspecialidadesPorFisioterapeuta(): void
             foreach ($blocos_trabalho as $bloco) {
                 $inicio = new \DateTime($data . ' ' . $bloco['hora_inicio']);
                 $fim = new \DateTime($data . ' ' . $bloco['hora_fim']);
-                
+
                 while ($inicio < $fim) {
                     $slot_atual = $inicio->format('H:i');
                     if (!in_array($slot_atual, $horarios_ocupados)) {
@@ -162,111 +145,91 @@ public function getEspecialidadesPorFisioterapeuta(): void
                     $inicio->modify("+{$duracao_sessao} minutes");
                 }
             }
-            
-            echo json_encode($slots_disponiveis);
 
+            echo json_encode($slots_disponiveis);
         } catch (\Exception $e) {
             echo json_encode(['erro' => 'Data inválida ou erro no servidor.']);
         }
     }
-
-
-    // Os métodos insert() e update() permanecem os mesmos que te enviei anteriormente
-   public function insert(): void
-{
+    public function insert(): void
+    {
 
 
 
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        Redirect::page($this->controller);
-        return;
-    }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Redirect::page($this->controller);
+            return;
+        }
+        $post         = $this->request->getPost();
+        $sessaoData   = $post['sessao'] ?? [];
 
-    // 1) Extrai apenas o array sessao[...] do POST
-    $post         = $this->request->getPost();
-    $sessaoData   = $post['sessao'] ?? [];
+        echo "<h2>Dados que serão inseridos:</h2><pre>";
+        print_r($sessaoData);
+        echo "</pre>";
 
-    // DEBUG: veja o array que vai pro insert
-    echo "<h2>Dados que serão inseridos:</h2><pre>";
-    print_r($sessaoData);
-    echo "</pre>";
+        $isRecorrente = !empty($sessaoData['is_recorrente']);
+        $tipoRec      = $sessaoData['tipo_recorrencia'] ?? null;
+        $quantidade   = (int)($sessaoData['quantidade_repeticoes'] ?? 1);
 
+        if (Validator::make($sessaoData, $this->model->validationRules)) {
+            Redirect::page($this->controller . "/form/insert/0", [
+                "msgError" => "Falha ao agendar. Verifique os dados."
+            ]);
+            return;
+        }
+        if ($isRecorrente) {
+            $recorrenciaId = uniqid('rec_');
+            $dataInicial   = new \DateTime($sessaoData['data_hora_agendamento']);
+            $intervalo     = match ($tipoRec) {
+                'diariamente'   => 'P1D',
+                'quinzenalmente' => 'P15D',
+                'mensalmente'   => 'P1M',
+                default         => 'P1W',
+            };
 
-    // 2) Campos de controle (não pertencem à tabela)
-    $isRecorrente = !empty($sessaoData['is_recorrente']);
-    $tipoRec      = $sessaoData['tipo_recorrencia'] ?? null;
-    $quantidade   = (int)($sessaoData['quantidade_repeticoes'] ?? 1);
+            $sucesso = true;
+            $erros   = [];
 
-    // 3) Validação geral
-    if (Validator::make($sessaoData, $this->model->validationRules)) {
-        Redirect::page($this->controller . "/form/insert/0", [
-            "msgError" => "Falha ao agendar. Verifique os dados."
-        ]);
-        return;
-    }
+            for ($i = 0; $i < $quantidade; $i++) {
+                $dados = $sessaoData;
+                unset($dados['is_recorrente'], $dados['tipo_recorrencia'], $dados['quantidade_repeticoes']);
 
-    // 4) Recorrência?
-    if ($isRecorrente) {
-        $recorrenciaId = uniqid('rec_');
-        $dataInicial   = new \DateTime($sessaoData['data_hora_agendamento']);
-        $intervalo     = match($tipoRec) {
-            'diariamente'   => 'P1D',
-            'quinzenalmente' => 'P15D',
-            'mensalmente'   => 'P1M',
-            default         => 'P1W',
-        };
+                if ($i > 0) {
+                    $dataInicial->add(new \DateInterval($intervalo));
+                }
 
-        $sucesso = true;
-        $erros   = [];
+                $dados['data_hora_agendamento'] = $dataInicial->format('Y-m-d H:i:s');
+                $dados['recorrencia_id']        = $recorrenciaId;
 
-        for ($i = 0; $i < $quantidade; $i++) {
+                if (!$this->model->insert($dados, false)) {
+                    $sucesso = false;
+                    $erros[] = "Erro em " . $dados['data_hora_agendamento'];
+                }
+            }
+
+            if ($sucesso) {
+                Redirect::page($this->controller, [
+                    "msgSucesso" => "$quantidade sessões recorrentes agendadas com sucesso."
+                ]);
+            } else {
+                Redirect::page($this->controller, [
+                    "msgError" => "Falha ao agendar recorrência: " . implode('; ', $erros)
+                ]);
+            }
+        } else {
             $dados = $sessaoData;
-            // remove campos extras
             unset($dados['is_recorrente'], $dados['tipo_recorrencia'], $dados['quantidade_repeticoes']);
 
-            if ($i > 0) {
-                $dataInicial->add(new \DateInterval($intervalo));
+            unset($dados['data_selecionada']);
+            if (empty($dados['id'])) {
+                unset($dados['id']);
             }
-
-            $dados['data_hora_agendamento'] = $dataInicial->format('Y-m-d H:i:s');
-            $dados['recorrencia_id']        = $recorrenciaId;
-
-            if (!$this->model->insert($dados, false)) {
-                $sucesso = false;
-                $erros[] = "Erro em " . $dados['data_hora_agendamento'];
-            }
-        }
-
-        if ($sucesso) {
-            Redirect::page($this->controller, [
-                "msgSucesso" => "$quantidade sessões recorrentes agendadas com sucesso."
-            ]);
-        } else {
-            Redirect::page($this->controller, [
-                "msgError" => "Falha ao agendar recorrência: " . implode('; ', $erros)
-            ]);
-        }
-
-    } else {
-        // 5) Sessão única
-       // 5) Sessão única
-        $dados = $sessaoData;
-        // campos extras
-        unset($dados['is_recorrente'], $dados['tipo_recorrencia'], $dados['quantidade_repeticoes']);
-        // campo que não existe na tabela
-        unset($dados['data_selecionada']);
-        if (empty($dados['id'])) {
-            unset($dados['id']);
-        }
-
-        // tenta inserir
-        $ok = $this->model->insert($dados, false);
-        if ($ok) {
+            $ok = $this->model->insert($dados, false);
+            if ($ok) {
                 Redirect::page($this->controller, [
                     "msgSucesso" => "Sessão agendada com sucesso."
                 ]);
             } else {
-                // DEBUG: captura erro do driver e SQL gerado
                 $dbError   = $this->model->db->error();
                 $lastQuery = method_exists($this->model->db, 'getLastQuery')
                     ? $this->model->db->getLastQuery()
@@ -277,58 +240,70 @@ public function getEspecialidadesPorFisioterapeuta(): void
                 echo "</pre>";
                 die;
             }
-
-    }
-}
-
-
-   public function update(): void
-{
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        Redirect::page($this->controller);
-        return;
-    }
-
-    // 1) Recebe o array sessao[...] do POST
-    $post       = $this->request->getPost();
-    $sessaoData = $post['sessao'] ?? [];
-
-    // 2) Normaliza o datetime-local (YYYY-MM-DDTHH:MM → YYYY-MM-DD HH:MM:SS)
-    if (!empty($sessaoData['data_hora_agendamento'])) {
-        $raw  = $sessaoData['data_hora_agendamento'];      // ex: "2025-06-26T14:00"
-        $norm = str_replace('T', ' ', $raw);               // "2025-06-26 14:00"
-        if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/', $norm)) {
-            $norm .= ':00';                                // "2025-06-26 14:00:00"
         }
-        $sessaoData['data_hora_agendamento'] = $norm;
     }
 
-    // 3) Validação
-    if (Validator::make($sessaoData, $this->model->validationRules)) {
-        Redirect::page($this->controller . "/form/update/" . ($sessaoData['id'] ?? ''), [
-            "msgError" => "O campo Data e Hora está com o formato incorreto. Formato esperado: AAAA-MM-DD HH:MM:SS"
-        ]);
-        return;
+
+    public function update(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Redirect::page($this->controller);
+            return;
+        }
+        $post       = $this->request->getPost();
+        $sessaoData = $post['sessao'] ?? [];
+
+        if (!empty($sessaoData['data_hora_agendamento'])) {
+            $raw  = $sessaoData['data_hora_agendamento'];
+            $norm = str_replace('T', ' ', $raw);
+            if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/', $norm)) {
+                $norm .= ':00';
+            }
+            $sessaoData['data_hora_agendamento'] = $norm;
+        }
+
+        if (Validator::make($sessaoData, $this->model->validationRules)) {
+            Redirect::page($this->controller . "/form/update/" . ($sessaoData['id'] ?? ''), [
+                "msgError" => "O campo Data e Hora está com o formato incorreto. Formato esperado: AAAA-MM-DD HH:MM:SS"
+            ]);
+            return;
+        }
+        unset($sessaoData['data_selecionada']);
+
+        if ($this->model->update($sessaoData)) {
+            Redirect::page($this->controller, [
+                "msgSucesso" => "Agendamento atualizado com sucesso."
+            ]);
+        } else {
+            Redirect::page($this->controller . "/form/update/" . ($sessaoData['id'] ?? ''), [
+                "msgError" => "Falha ao atualizar. Tente novamente."
+            ]);
+        }
     }
 
-    // 4) Remove qualquer campo extra que não exista na tabela
-    unset($sessaoData['data_selecionada']);
+    public function delete(string $action = '0', int $id = 0): void
+    {
+        if ($id <= 0) {
+            Redirect::page($this->controller, ["msgError" => "ID da sessão não fornecido para exclusão."]);
+            return;
+        }
 
-    // 5) Atualiza no banco
-    if ($this->model->update($sessaoData)) {
-        Redirect::page($this->controller, [
-            "msgSucesso" => "Agendamento atualizado com sucesso."
-        ]);
-    } else {
-        Redirect::page($this->controller . "/form/update/" . ($sessaoData['id'] ?? ''), [
-            "msgError" => "Falha ao atualizar. Tente novamente."
-        ]);
+        $sessao = $this->model->getById($id);
+        if (! $sessao) {
+            Redirect::page($this->controller, ["msgError" => "Sessão não encontrada."]);
+            return;
+        }
+
+        if ($this->model->possuiFichaEvolucaoVinculada($id)) {
+            $msg = "Não é possível excluir: esta sessão possui ficha de evolução vinculada.";
+            Redirect::page($this->controller, ["msgError" => $msg]);
+            return;
+        }
+
+        if ($this->model->delete($id)) {
+            Redirect::page($this->controller, ["msgSucesso" => "Sessão excluída com sucesso."]);
+        } else {
+            Redirect::page($this->controller, ["msgError" => "Erro ao excluir a sessão."]);
+        }
     }
-}
-
-
-
-
-
-
 }

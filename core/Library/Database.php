@@ -60,9 +60,7 @@ class Database
     {
     }
 
-    /**
-     * destruct - Método que destroi a conexão com banco de dados e remove da memória todas as variáveis setadas
-     */
+   
     public function __destruct() {
         $this->disconnect();
         foreach ($this as $key => $value) {
@@ -110,7 +108,6 @@ class Database
             $this->conexao->setAttribute(PDO::ATTR_ERRMODE, $this->conexao::ERRMODE_EXCEPTION);
 
         } catch (PDOException $i) {
-            //se houver exceçao, exibe
             die("Erro: <code>" . $i->getMessage() . "</code>");
         }
 

@@ -7,23 +7,23 @@
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label for="nome_plano" class="form-label">Nome do Plano <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="nome_plano" name="nome_plano" 
-                       value="<?= setValor('nome_plano', $aDados['plano_saude']['nome_plano'] ?? '') ?>" 
-                       required>
+                <input type="text" class="form-control" id="nome_plano" name="nome_plano"
+                    value="<?= setValor('nome_plano', $aDados['plano_saude']['nome_plano'] ?? '') ?>"
+                    required>
                 <?= setMsgFilderError("nome_plano") ?>
             </div>
             <div class="col-md-6 mb-3">
                 <label for="contato_responsavel" class="form-label">Contato Responsável</label>
-                <input type="text" class="form-control" id="contato_responsavel" name="contato_responsavel" 
-                       value="<?= setValor('contato_responsavel', $aDados['plano_saude']['contato_responsavel'] ?? '') ?>">
+                <input type="text" class="form-control" id="contato_responsavel" name="contato_responsavel"
+                    value="<?= setValor('contato_responsavel', $aDados['plano_saude']['contato_responsavel'] ?? '') ?>">
             </div>
         </div>
 
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label for="telefone" class="form-label">Telefone</label>
-                <input type="text" class="form-control" id="telefone" name="telefone" 
-                       value="<?= setValor('telefone', $aDados['plano_saude']['telefone'] ?? '') ?>">
+                <input type="text" class="form-control" id="telefone" name="telefone"
+                    value="<?= setValor('telefone', $aDados['plano_saude']['telefone'] ?? '') ?>">
             </div>
             <div class="col-md-6 mb-3">
                 <label for="status" class="form-label">Status</label>

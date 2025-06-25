@@ -37,49 +37,41 @@ class Fisioterapeuta extends ControllerMain
                 break;
         }
         $this->loadView("sistema/listaFisioterapeuta", $aDados);
-
     }
-    
+
     public function form(string $action = 'insert', int $id = 0): void
     {
         $aDados['action'] = $action;
         $aDados['fisioterapeuta'] = null;
-        $aDados['especialidades_selecionadas'] = []; // Array para guardar as especialidades marcadas
+        $aDados['especialidades_selecionadas'] = [];
 
         if ($action !== 'insert' && $id > 0) {
             $aDados['fisioterapeuta'] = $this->fisioterapeutaModel->getById($id);
-            // Busca os IDs das especialidades que já estão salvas para este fisio
             $aDados['especialidades_selecionadas'] = $this->fisioterapeutaModel->getEspecialidadesIds($id);
         }
-        
-        // Busca todas as especialidades disponíveis para montar os checkboxes
+
         $especialidadeModel = new EspecialidadeModel();
         $aDados['todas_especialidades'] = $especialidadeModel
             ->db
             ->orderBy('nome', 'ASC')
             ->findAll();
-        
+
         $this->loadView('sistema/formFisioterapeuta', $aDados);
     }
-    
+
     public function insert(): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $post = $this->request->getPost();
-            
-            // 1. Separa os dados corretamente
-            $especialidadesIds = $post['especialidades'] ?? [];
-            $fisioterapeutaData = $post; // Copia todos os dados do post
-            
-            // 2. Remove o que não pertence à tabela 'fisioterapeutas'
-            unset($fisioterapeutaData['especialidades']);
-            unset($fisioterapeutaData['id']); // Remove o ID vazio para a inserção
 
-            // 3. Insere os dados APENAS do fisioterapeuta e pega o ID retornado
+            $especialidadesIds = $post['especialidades'] ?? [];
+            $fisioterapeutaData = $post;
+
+            unset($fisioterapeutaData['especialidades']);
+            unset($fisioterapeutaData['id']);
             $fisioterapeutaId = $this->fisioterapeutaModel->insert($fisioterapeutaData, false);
 
             if ($fisioterapeutaId > 0) {
-                // 4. Com o novo ID, salva as especialidades associadas
                 $this->fisioterapeutaModel->salvarEspecialidades($fisioterapeutaId, $especialidadesIds);
                 Redirect::page('Fisioterapeuta', ["msgSucesso" => "Fisioterapeuta salvo com sucesso."]);
             } else {
@@ -88,8 +80,8 @@ class Fisioterapeuta extends ControllerMain
             }
         }
     }
-    
-    
+
+
     public function update(): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -99,9 +91,7 @@ class Fisioterapeuta extends ControllerMain
 
             unset($post['especialidades']);
 
-            // 1. Atualiza os dados principais do fisioterapeuta
             if ($this->fisioterapeutaModel->update($post) !== false) {
-                // 2. Atualiza as especialidades associadas
                 $this->fisioterapeutaModel->salvarEspecialidades($fisioterapeutaId, $especialidadesIds);
                 Redirect::page('Fisioterapeuta', ["msgSucesso" => "Fisioterapeuta atualizado com sucesso."]);
             } else {
@@ -111,7 +101,7 @@ class Fisioterapeuta extends ControllerMain
     }
 
 
-        public function delete(string $action = '0', int $id = 0): void
+    public function delete(string $action = '0', int $id = 0): void
     {
         if ($id <= 0) {
             Redirect::page($this->controller, ["msgError" => "ID inválido."]);
@@ -125,12 +115,9 @@ class Fisioterapeuta extends ControllerMain
             return;
         }
 
-        // 2. Se não houver vínculo, prossegue com a exclusão
         try {
-            // Remove as associações de especialidades primeiro
             $this->model->salvarEspecialidades($id, []);
-            
-            // Deleta o registro principal do fisioterapeuta
+
             if ($this->model->delete($id)) {
                 Redirect::page($this->controller, ["msgSucesso" => "Fisioterapeuta excluído com sucesso."]);
             } else {

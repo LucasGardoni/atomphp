@@ -25,7 +25,7 @@ class PlanoSaude extends ControllerMain
     {
         $aDados['action'] = $action;
         $aDados['plano_saude'] = $this->model->getById($id);
-        
+
         $aDados['titulo'] = ($action === 'update') ? 'Editar Plano de Saúde' : 'Novo Plano de Saúde';
         $this->loadView("sistema/formPlanoSaude", $aDados);
     }
@@ -66,7 +66,7 @@ class PlanoSaude extends ControllerMain
                 Redirect::page($this->controller, ["msgError" => "Falha ao excluir. O plano pode estar em uso."]);
             }
         } else {
-             Redirect::page($this->controller, ["msgError" => "ID inválido para exclusão."]);
+            Redirect::page($this->controller, ["msgError" => "ID inválido para exclusão."]);
         }
     }
 }

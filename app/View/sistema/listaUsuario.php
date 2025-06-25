@@ -52,7 +52,7 @@ $aStatus = ["1" => "Ativo", "2" => "Inativo", "3" => "Bloqueado"];
                                         if (($value['statusRegistro'] ?? '') == 1) {
                                             $badgeClass = 'badge-active';
                                         } else if (($value['statusRegistro'] ?? '') == 3) {
-                                            $badgeClass = 'badge-blocked'; 
+                                            $badgeClass = 'badge-blocked';
                                         }
                                         ?>
                                         <span class="badge <?= $badgeClass ?>"><?= $statusText ?></span>
@@ -91,4 +91,3 @@ $aStatus = ["1" => "Ativo", "2" => "Inativo", "3" => "Bloqueado"];
         </div>
     </div>
 </div>
-

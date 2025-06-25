@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="<?= baseUrl() ?>assets/css/formPaciente.css">
+<link rel="stylesheet" href="<?= baseUrl() ?>assets/css/form.css">
 <?php
 $action = $aDados['action'] ?? 'insert';
 $isViewMode = ($action === 'view');
@@ -71,7 +71,6 @@ $errors = $aDados['erros'] ?? [];
             <div class="col-12 col-md-6">
                 <label for="plano_saude_id" class="form-label font-semibold">Plano de Saúde</label>
                 
-                <!-- CAMPO DE TEXTO TROCADO POR UMA COMBOBOX (SELECT) -->
                 <select class="form-select form-select-custom" id="plano_saude_id" name="paciente[plano_saude_id]" <?= $disabledAttribute ?>>
                             <option value="">Nenhum / Particular</option>
                             <?php 
@@ -86,7 +85,6 @@ $errors = $aDados['erros'] ?? [];
                                 </option>
                             <?php endforeach; ?>
                 </select>
-                <!-- FIM DA ALTERAÇÃO -->
             </div>
         </div>
         <div class="col-12 col-md-6">
@@ -97,7 +95,7 @@ $errors = $aDados['erros'] ?? [];
                 class="form-select form-select-custom"
                 required <?= $disabledAttribute ?>>
                 <?php 
-                // valores possíveis: 1 = Ativo, 0 = Inativo
+
                 $statusAtual = (int)($aDados['paciente']['status'] ?? 1);
                 ?>
                 <option value="1" <?= $statusAtual === 1 ? 'selected' : '' ?>>Ativo</option>
@@ -133,7 +131,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const ufInput = document.getElementById('uf');
     const numeroInput = document.getElementById('numero');
 
-    // Função para destravar os campos para edição manual
     function destravarCampos() {
         logradouroInput.readOnly = false;
         bairroInput.readOnly = false;
@@ -141,7 +138,6 @@ document.addEventListener('DOMContentLoaded', function() {
         ufInput.readOnly = false;
     }
 
-    // Função para travar os campos após busca bem-sucedida
     function travarCampos() {
         logradouroInput.readOnly = true;
         bairroInput.readOnly = true;
@@ -149,12 +145,11 @@ document.addEventListener('DOMContentLoaded', function() {
         ufInput.readOnly = true;
     }
 
-    // Função que busca o CEP (lógica que já existia)
     function buscarCep() {
-        const cep = cepInput.value.replace(/\D/g, ''); // Remove tudo que não for dígito
+        const cep = cepInput.value.replace(/\D/g, ''); 
 
         if (cep.length !== 8) {
-            destravarCampos(); // Se o CEP for inválido, garante que os campos estejam liberados
+            destravarCampos(); 
             return;
         }
 
@@ -185,21 +180,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     if(cepInput) {
-        // O listener 'blur' (quando o usuário sai do campo) continua o mesmo
         cepInput.addEventListener('blur', buscarCep);
 
-        // ==== NOVO BLOCO DE CÓDIGO ADICIONADO ====
-        // Adiciona um listener para a tecla pressionada
+        
         cepInput.addEventListener('keydown', function(event) {
-            // Verifica se a tecla pressionada foi 'Enter'
             if (event.key === 'Enter') {
-                // 1. Impede o comportamento padrão (submeter o formulário)
                 event.preventDefault();
-                // 2. Aciona a busca do CEP, como se o usuário tivesse saído do campo
                 buscarCep();
             }
         });
-        // ==== FIM DO NOVO BLOCO ====
     }
 });
 </script>

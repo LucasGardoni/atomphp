@@ -1,4 +1,3 @@
-
 <div class="card col-lg-4 card-background">
     <div class="card-header">
         <div class="justify-content-center">

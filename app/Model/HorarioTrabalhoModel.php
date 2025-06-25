@@ -15,13 +15,10 @@ class HorarioTrabalhoModel extends ModelMain
         "hora_fim" => ["label" => "Hora de Fim", "rules" => "obrigatorio"],
     ];
 
-    /**
-     * Lista todos os horários de um fisioterapeuta específico, ordenados.
-     */
     public function listaPorFisioterapeuta(int $fisioterapeuta_id)
     {
         return $this->db->where('fisioterapeuta_id', $fisioterapeuta_id)
-                       ->orderBy('dia_semana, hora_inicio')
-                       ->findAll();
+            ->orderBy('dia_semana, hora_inicio')
+            ->findAll();
     }
 }

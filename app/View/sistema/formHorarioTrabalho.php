@@ -2,7 +2,7 @@
 <?php
 $action = $aDados['action'] ?? 'insert';
 $isViewMode = ($action === 'view');
-$disabledAttribute = $isViewMode ? 'disabled' : ''; 
+$disabledAttribute = $isViewMode ? 'disabled' : '';
 
 $fisioterapeutaNome = $aDados['fisioterapeuta_nome'] ?? 'Fisioterapeuta Desconhecido';
 

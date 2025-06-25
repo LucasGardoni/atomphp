@@ -17,8 +17,6 @@ class Especialidade extends ControllerMain
     public function index(): void
     {
         $aDados['titulo'] = 'Especialidades';
-        // ---- CORREÇÃO APLICADA AQUI ----
-        // Trocado o método inexistente 'getAll()' pelo método correto 'lista()'
         $aDados['especialidades'] = $this->model->lista('nome');
         
         $this->loadView("sistema/listaEspecialidade", $aDados);
@@ -71,7 +69,6 @@ class Especialidade extends ControllerMain
 
     public function delete(string $action = '0', int $id = 0): void
     {
-        // O ID para deletar vem como segundo parâmetro da URL
         if ($id > 0) {
             if ($this->model->delete($id)) {
                 Redirect::page($this->controller, ["msgSucesso" => "Especialidade excluída com sucesso."]);

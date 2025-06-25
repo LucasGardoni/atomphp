@@ -2,6 +2,9 @@
 
 use Core\Library\Session;
 
+$userId    = Session::get("userId");
+$userNivel = (int) Session::get("userNivel");
+
 ?>
 
 <!DOCTYPE html>
@@ -18,7 +21,7 @@ use Core\Library\Session;
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
     <link rel="stylesheet" href="<?= baseUrl() ?>assets/css/cabecalho.css">
-    
+
     <style>
         html {
             scroll-behavior: smooth;
@@ -40,46 +43,65 @@ use Core\Library\Session;
             </a>
 
             <nav class="d-none d-md-flex align-items-center">
-                <ul class="navbar-nav flex-row"> <li class="nav-item me-3"><a class="nav-link nav-link-custom" href="<?= baseUrl() ?>">Home</a></li>
+                <ul class="navbar-nav flex-row">
+                    <li class="nav-item me-3"><a class="nav-link nav-link-custom" href="<?= baseUrl() ?>">Home</a></li>
                     <li class="nav-item me-3"><a class="nav-link nav-link-custom" href="#sobre">Sobre Nós</a></li>
                     <li class="nav-item"><a class="nav-link nav-link-custom" href="#servicos">Serviços</a></li>
                 </ul>
             </nav>
 
             <div class="d-none d-md-flex align-items-center">
-                <?php if (Session::get("userId")) : // Menus para usuários logados (desktop)
-                ?>
+                <?php if ($userId): ?>
                     <ul class="navbar-nav flex-row align-items-center">
+
+                        <!-- Dropdown Usuário -->
                         <li class="nav-item dropdown me-2">
-                            <a class="nav-link dropdown-toggle text-dark nav-link-custom-dropdown" href="#" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle text-dark nav-link-custom-dropdown" href="#"
+                                role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-person-circle me-1 text-primary"></i> Usuário
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 animated-dropdown">
-                                <?php if ((int)Session::get("userNivel") <= 20) : ?>
+                                <?php if ($userNivel === 1): // administrador ?>
                                     <li><a class="dropdown-item" href="<?= baseUrl() ?>Usuario">Listar Usuários</a></li>
                                     <li><a class="dropdown-item" href="<?= baseUrl() ?>Usuario/form/insert/0">Novo Usuário</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="<?= baseUrl() ?>Usuario/formTrocarSenha">Trocar a Senha</a></li>
+                                    <li><hr class="dropdown-divider"></li>
                                 <?php endif; ?>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item" href="<?= baseUrl() ?>Usuario/formTrocarSenha">Trocar a Senha</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item" href="<?= baseUrl() ?>Uf">UF's</a></li>
-                                <li><a class="dropdown-item" href="<?= baseUrl() ?>Cidade">Cidade</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
                                 <li><a class="dropdown-item text-danger" href="<?= baseUrl() ?>login/signOut">Sair</a></li>
                             </ul>
                         </li>
-                        <?php if ((int)Session::get("userNivel") <= 20) : ?>
+
+                        <?php if ($userNivel === 2): // usuário comum ?>
+                            <!-- Menu Pacientes para nível 2 -->
                             <li class="nav-item dropdown me-2">
-                                <a class="nav-link dropdown-toggle text-dark nav-link-custom-dropdown" href="#" role="button"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-people-fill me-1 text-primary "></i> Pacientes
+                                <a class="nav-link dropdown-toggle text-dark nav-link-custom-dropdown" href="#"
+                                    role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-people-fill me-1 text-primary"></i> Pacientes
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 animated-dropdown">
+                                    <li><a class="dropdown-item" href="<?= baseUrl() ?>Paciente">Listar Pacientes</a></li>
+                                    <li><a class="dropdown-item" href="<?= baseUrl() ?>Paciente/form/insert/0">Novo Paciente</a></li>
+                                </ul>
+                            </li>
+                            <!-- Menu Agenda para nível 2 -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark nav-link-custom-dropdown" href="#"
+                                    role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-calendar-event-fill me-1 text-primary"></i> Agenda
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 animated-dropdown">
+                                    <li><a class="dropdown-item" href="<?= baseUrl() ?>Sessao">Ver Agenda Completa</a></li>
+                                    <li><a class="dropdown-item" href="<?= baseUrl() ?>Sessao/form/insert/0">Novo Agendamento</a></li>
+                                </ul>
+                            </li>
+
+                        <?php elseif ($userNivel === 1): // administrador ?>
+                            <!-- Menu Pacientes para administrador -->
+                            <li class="nav-item dropdown me-2">
+                                <a class="nav-link dropdown-toggle text-dark nav-link-custom-dropdown" href="#"
+                                    role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-people-fill me-1 text-primary"></i> Pacientes
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 animated-dropdown">
                                     <li><a class="dropdown-item" href="<?= baseUrl() ?>Paciente">Listar Pacientes</a></li>
@@ -87,20 +109,23 @@ use Core\Library\Session;
                                     <li><a class="dropdown-item" href="<?= baseUrl() ?>PlanoSaude">Plano Saude</a></li>
                                 </ul>
                             </li>
+                            <!-- Menu Fisioterapeutas para administrador -->
                             <li class="nav-item dropdown me-2">
-                                <a class="nav-link dropdown-toggle text-dark nav-link-custom-dropdown" href="#" role="button"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-clipboard2-pulse-fill me-1 text-primary "></i> Fisioterapeutas
+                                <a class="nav-link dropdown-toggle text-dark nav-link-custom-dropdown" href="#"
+                                    role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-clipboard2-pulse-fill me-1 text-primary"></i> Fisioterapeutas
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 animated-dropdown">
                                     <li><a class="dropdown-item" href="<?= baseUrl() ?>Fisioterapeuta">Listar Fisioterapeutas</a></li>
                                     <li><a class="dropdown-item" href="<?= baseUrl() ?>Fisioterapeuta/form/insert/0">Novo Fisioterapeuta</a></li>
+                                    <li><a class="dropdown-item" href="<?= baseUrl() ?>Especialidade">Nova especialidade</a></li>
                                 </ul>
                             </li>
+                            <!-- Menu Agenda para administrador -->
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-dark nav-link-custom-dropdown" href="#" role="button"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-calendar-event-fill me-1 text-primary "></i> Agenda
+                                <a class="nav-link dropdown-toggle text-dark nav-link-custom-dropdown" href="#"
+                                    role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-calendar-event-fill me-1 text-primary"></i> Agenda
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 animated-dropdown">
                                     <li><a class="dropdown-item" href="<?= baseUrl() ?>Sessao">Ver Agenda Completa</a></li>
@@ -108,9 +133,9 @@ use Core\Library\Session;
                                 </ul>
                             </li>
                         <?php endif; ?>
+
                     </ul>
-                <?php else : // Botão "Área restrita" para visitantes (desktop)
-                ?>
+                <?php else: ?>
                     <a href="<?= baseUrl() ?>Login" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm transition-hover-scale">Login</a>
                 <?php endif; ?>
             </div>
@@ -133,38 +158,31 @@ use Core\Library\Session;
                         <a class="nav-link" href="#servicos">Serviços</a>
                     </li>
 
-                    <?php if (Session::get("userId")) : // Menus para usuários logados (mobile)
-                    ?>
+                    <?php if ($userId): ?>
+                        <!-- Usuário (mobile) -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                                 aria-expanded="false">
                                 <i class="bi bi-person-circle me-1"></i> Usuário
                             </a>
                             <ul class="dropdown-menu border-0 animated-dropdown">
-                                <?php if ((int)Session::get("userNivel") <= 20) : ?>
+                                <?php if ($userNivel === 1): ?>
                                     <li><a class="dropdown-item" href="<?= baseUrl() ?>Usuario">Listar Usuários</a></li>
                                     <li><a class="dropdown-item" href="<?= baseUrl() ?>Usuario/form/insert/0">Novo Usuário</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="<?= baseUrl() ?>Usuario/formTrocarSenha">Trocar a Senha</a></li>
+                                    <li><a class="dropdown-item" href="<?= baseUrl() ?>Uf">UF's</a></li>
+                                    <li><a class="dropdown-item" href="<?= baseUrl() ?>Cidade">Cidade</a></li>
+                                    <li><hr class="dropdown-divider"></li>
                                 <?php endif; ?>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item" href="<?= baseUrl() ?>Usuario/formTrocarSenha">Trocar a Senha</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item" href="<?= baseUrl() ?>Uf">UF's</a></li>
-                                <li><a class="dropdown-item" href="<?= baseUrl() ?>Cidade">Cidade</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
                                 <li><a class="dropdown-item text-danger" href="<?= baseUrl() ?>login/signOut">Sair</a></li>
                             </ul>
                         </li>
 
-                        <?php if ((int)Session::get("userNivel") <= 20) : ?>
+                        <?php if ($userNivel === 2): ?>
+                            <!-- Pacientes (mobile) nível 2 -->
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                     <i class="bi bi-people-fill me-1"></i> Pacientes
                                 </a>
                                 <ul class="dropdown-menu border-0 animated-dropdown">
@@ -172,25 +190,43 @@ use Core\Library\Session;
                                     <li><a class="dropdown-item" href="<?= baseUrl() ?>Paciente/form/insert/0">Novo Paciente</a></li>
                                 </ul>
                             </li>
-                        <?php endif; ?>
-
-                        <?php if ((int)Session::get("userNivel") <= 20) : ?>
+                            <!-- Agenda (mobile) nível 2 -->
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-calendar-event-fill me-1"></i> Agenda
+                                </a>
+                                <ul class="dropdown-menu border-0 animated-dropdown">
+                                    <li><a class="dropdown-item" href="<?= baseUrl() ?>Sessao">Ver Agenda Completa</a></li>
+                                    <li><a class="dropdown-item" href="<?= baseUrl() ?>Sessao/form/insert/0">Novo Agendamento</a></li>
+                                </ul>
+                            </li>
+
+                        <?php elseif ($userNivel === 1): ?>
+                            <!-- Pacientes (mobile) administrador -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-people-fill me-1"></i> Pacientes
+                                </a>
+                                <ul class="dropdown-menu border-0 animated-dropdown">
+                                    <li><a class="dropdown-item" href="<?= baseUrl() ?>Paciente">Listar Pacientes</a></li>
+                                    <li><a class="dropdown-item" href="<?= baseUrl() ?>Paciente/form/insert/0">Novo Paciente</a></li>
+                                    <li><a class="dropdown-item" href="<?= baseUrl() ?>PlanoSaude">Plano Saude</a></li>
+                                </ul>
+                            </li>
+                            <!-- Fisioterapeutas (mobile) administrador -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                     <i class="bi bi-clipboard2-pulse-fill me-1"></i> Fisioterapeutas
                                 </a>
                                 <ul class="dropdown-menu border-0 animated-dropdown">
                                     <li><a class="dropdown-item" href="<?= baseUrl() ?>Fisioterapeuta">Listar Fisioterapeutas</a></li>
                                     <li><a class="dropdown-item" href="<?= baseUrl() ?>Fisioterapeuta/form/insert/0">Novo Fisioterapeuta</a></li>
+                                    <li><a class="dropdown-item" href="<?= baseUrl() ?>Especialidade">Nova especialidade</a></li>
                                 </ul>
                             </li>
-                        <?php endif; ?>
-
-                        <?php if ((int)Session::get("userNivel") <= 20) : ?>
+                            <!-- Agenda (mobile) administrador -->
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                     <i class="bi bi-calendar-event-fill me-1"></i> Agenda
                                 </a>
                                 <ul class="dropdown-menu border-0 animated-dropdown">
@@ -200,7 +236,7 @@ use Core\Library\Session;
                             </li>
                         <?php endif; ?>
 
-                    <?php else : ?>
+                    <?php else: ?>
                         <li class="nav-item">
                             <a class="nav-link" href="<?= baseUrl() ?>Login">Área restrita</a>
                         </li>
@@ -211,3 +247,4 @@ use Core\Library\Session;
     </header>
 
     <main class="container">
+

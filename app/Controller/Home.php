@@ -3,6 +3,8 @@
 
 namespace App\Controller;
 
+use Core\Library\Redirect;
+use Core\Library\Email;
 use Core\Library\ControllerMain;
 
 class Home extends ControllerMain
@@ -23,5 +25,37 @@ class Home extends ControllerMain
         echo "<br />Ação: " . $action;
         echo "<br />ID: " . $id;
         echo "<br />PARÂMETROS: " . implode(", ", $params);
+    }
+    public function contatoEnviaEmail()
+    {
+        $this->loadHelper("emailHelper");
+
+        $post = $this->request->getPost();
+
+        $emailTexto = emailContatoRecebido(
+            $post['nome'],
+            $post['celular'],
+            $post['email'],
+            $post['assunto'],
+            $post['mensagem']
+        );
+
+        $lRetMail = Email::enviaEmail(
+            $_ENV['MAIL.USER'],
+            $_ENV['MAIL.NOME'],
+            $emailTexto['assunto'],
+            $emailTexto['corpo'],
+            "atomfisioterapia@gmail.com"
+        );
+
+        if ($lRetMail) {
+            return Redirect::page("Home/contato", [
+                "msgSucesso" => "E-mail enviado com sucesso, em breve entraremos em contato!"
+            ]);
+        } else {
+            return Redirect::page("Home/contato", [
+                "msgError" => "Ocorreu um erro ao enviar o e-mail. Tente novamente."
+            ]);
+        }
     }
 }

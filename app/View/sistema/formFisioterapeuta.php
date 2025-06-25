@@ -1,10 +1,9 @@
-<link rel="stylesheet" href="<?= baseUrl() ?>assets/css/formPaciente.css">
+<link rel="stylesheet" href="<?= baseUrl() ?>assets/css/form.css">
 <?php
 $action = $aDados['action'] ?? 'insert';
 $isViewMode = ($action === 'view');
 $disabledAttribute = $isViewMode ? 'disabled' : '';
 
-// Ajustado para corresponder às variáveis do FisioterapeutaController
 $fisioterapeuta = $aDados['fisioterapeuta'] ?? null;
 $todasEspecialidades = $aDados['todas_especialidades'] ?? [];
 $especialidadesSelecionadas = $aDados['especialidades_selecionadas'] ?? [];
@@ -12,7 +11,7 @@ $especialidadesSelecionadas = $aDados['especialidades_selecionadas'] ?? [];
 
 <div class="space-y-6 container py-4">
     <div class="d-flex align-items-center mb-4">
-    <a href="<?= baseUrl() ?>Fisioterapeuta/index" class="btn btn-custom-primary btn-sm me-3">
+        <a href="<?= baseUrl() ?>Fisioterapeuta/index" class="btn btn-primary btn-sm me-3">
             <i class="bi bi-arrow-left me-2"></i> Voltar
         </a>
         <div>
@@ -94,11 +93,11 @@ $especialidadesSelecionadas = $aDados['especialidades_selecionadas'] ?? [];
                                     <div class="col-12 col-md-4 col-sm-6">
                                         <div class="form-check form-check-custom-checkbox py-2 px-3">
                                             <input class="form-check-input" type="checkbox"
-                                                   name="especialidades[]"
-                                                   value="<?= $especialidade['id'] ?>"
-                                                   id="especialidade_<?= $especialidade['id'] ?>"
-                                                   <?= in_array($especialidade['id'], $especialidadesSelecionadas) ? 'checked' : '' ?>
-                                                   <?= $disabledAttribute ?>>
+                                                name="especialidades[]"
+                                                value="<?= $especialidade['id'] ?>"
+                                                id="especialidade_<?= $especialidade['id'] ?>"
+                                                <?= in_array($especialidade['id'], $especialidadesSelecionadas) ? 'checked' : '' ?>
+                                                <?= $disabledAttribute ?>>
                                             <label class="form-check-label text-gray-800" for="especialidade_<?= $especialidade['id'] ?>">
                                                 <?= htmlspecialchars($especialidade['nome'])  ?>
                                             </label>
@@ -125,11 +124,11 @@ $especialidadesSelecionadas = $aDados['especialidades_selecionadas'] ?? [];
 
                 <div class="d-flex justify-content-end gap-3 pt-4">
                     <?php if (!$isViewMode): ?>
-                        <button type="submit" class="btn btn-custom-primary">
+                        <button type="submit" class="btn btn-primary btn-sm me-3">
                             <i class="bi bi-check-lg me-2"></i> Salvar
                         </button>
                     <?php endif; ?>
-                    <a href="<?= baseUrl() ?>Fisioterapeuta/index" class="btn btn-custom-secondary">
+                    <a href="<?= baseUrl() ?>Fisioterapeuta/index" class="btn btn-danger btn-custom-secondary">
                         <i class="bi bi-x-lg me-2"></i> Cancelar
                     </a>
                 </div>
